@@ -13,7 +13,7 @@ use tokio::net::TcpListener;
 
 // A handler for "/" page.
 async fn home_handler(_: Request<Incoming>) -> Result<Response<Full<Bytes>>, io::Error> {
-    Err(io::Error::new(io::ErrorKind::Other, "Some errors"))
+    Err(io::Error::other("Some errors"))
 }
 
 // A handler for "/about" page.
