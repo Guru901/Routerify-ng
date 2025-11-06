@@ -1,10 +1,10 @@
+use crate::Error;
 use crate::helpers;
 use crate::router::Router;
 use crate::types::{RequestContext, RequestInfo, RequestMeta};
-use crate::Error;
 use http_body_util::Full;
 use hyper::body::Bytes;
-use hyper::{service::Service, Request, Response};
+use hyper::{Request, Response, service::Service};
 use std::future::Future;
 use std::net::SocketAddr;
 use std::pin::Pin;

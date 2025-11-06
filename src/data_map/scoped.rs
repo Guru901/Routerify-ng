@@ -1,6 +1,6 @@
+use crate::Error;
 use crate::data_map::{DataMap, SharedDataMap};
 use crate::regex_generator::generate_exact_match_regex;
-use crate::Error;
 use regex::Regex;
 use std::fmt::{self, Debug, Formatter};
 use std::sync::Arc;

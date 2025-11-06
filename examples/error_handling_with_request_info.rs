@@ -2,7 +2,7 @@ use bytes::Bytes;
 use http_body_util::Full;
 use hyper::body::Incoming;
 use hyper::service::Service;
-use hyper::{header, Request, Response, StatusCode};
+use hyper::{Request, Response, StatusCode, header};
 use hyper_util::rt::{TokioExecutor, TokioIo};
 use hyper_util::server::conn::auto::Builder;
 use routerify_ng::{RequestInfo, Router, RouterService};

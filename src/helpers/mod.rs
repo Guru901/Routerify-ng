@@ -1,5 +1,5 @@
-use crate::types::RequestMeta;
 use crate::Error;
+use crate::types::RequestMeta;
 use http::Extensions;
 use percent_encoding::percent_decode_str;
 

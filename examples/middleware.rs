@@ -3,8 +3,8 @@ use http_body_util::Full;
 use hyper::body::Incoming;
 use hyper::service::Service;
 use hyper::{
-    header::{self, HeaderValue},
     Request, Response,
+    header::{self, HeaderValue},
 };
 use hyper_util::rt::TokioExecutor;
 use hyper_util::rt::TokioIo;
@@ -61,7 +61,7 @@ async fn my_session_middleware(
     Ok(res)
 }
 
-fn router() -> Router< io::Error> {
+fn router() -> Router<io::Error> {
     // Create a router and specify the the handlers.
     Router::builder()
         // Create a pre middleware using `Middleware::pre()` method
