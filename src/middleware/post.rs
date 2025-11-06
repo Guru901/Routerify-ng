@@ -1,9 +1,9 @@
+use crate::Error;
 use crate::regex_generator::generate_exact_match_regex;
 use crate::types::RequestInfo;
-use crate::Error;
 use http_body_util::Full;
-use hyper::body::Bytes;
 use hyper::Response;
+use hyper::body::Bytes;
 use regex::Regex;
 use std::fmt::{self, Debug, Formatter};
 use std::future::Future;
@@ -66,7 +66,7 @@ impl<E: Into<Box<dyn std::error::Error + Send + Sync>> + 'static> PostMiddleware
     /// # Examples
     ///
     /// ```
-    /// use routerify::{Middleware, PostMiddleware, Router};
+    /// use routerify_ng::{Middleware, PostMiddleware, Router};
     /// use std::convert::Infallible;
     ///
     /// fn run() -> Router<Infallible> {
@@ -104,7 +104,7 @@ impl<E: Into<Box<dyn std::error::Error + Send + Sync>> + 'static> PostMiddleware
     ///     body::{Bytes, Incoming},
     ///     Response,
     /// };
-    /// use routerify::{Middleware, PostMiddleware, RequestInfo, Router};
+    /// use routerify_ng::{Middleware, PostMiddleware, RequestInfo, Router};
     /// use std::convert::Infallible;
     ///
     /// async fn post_middleware_with_info_handler(
@@ -161,8 +161,8 @@ impl<E: Into<Box<dyn std::error::Error + Send + Sync>> + 'static> PostMiddleware
             .expect("A router can not be used after mounting into another router");
 
         match handler {
-            Handler::WithoutInfo(ref handler) => Pin::from(handler(res)).await.map_err(Into::into),
-            Handler::WithInfo(ref handler) => Pin::from(handler(res, req_info.expect("No RequestInfo is provided")))
+            Handler::WithoutInfo(handler) => Pin::from(handler(res)).await.map_err(Into::into),
+            Handler::WithInfo(handler) => Pin::from(handler(res, req_info.expect("No RequestInfo is provided")))
                 .await
                 .map_err(Into::into),
         }

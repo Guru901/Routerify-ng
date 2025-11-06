@@ -5,31 +5,31 @@ use hyper::service::Service;
 use hyper::{Request, Response, StatusCode};
 use hyper_util::rt::{TokioExecutor, TokioIo};
 use hyper_util::server::conn::auto::Builder;
-use routerify::{Router, RouterService};
+use routerify_ng::{Router, RouterService};
 use std::net::SocketAddr;
 use std::sync::Arc;
 use tokio::net::TcpListener;
 
 // A handler for "/" page.
-async fn home_handler(_: Request<Incoming>) -> Result<Response<Full<Bytes>>, routerify::Error> {
-    Err(routerify::Error::new("Some errors"))
+async fn home_handler(_: Request<Incoming>) -> Result<Response<Full<Bytes>>, routerify_ng::Error> {
+    Err(routerify_ng::Error::new("Some errors"))
 }
 
 // A handler for "/about" page.
-async fn about_handler(_: Request<Incoming>) -> Result<Response<Full<Bytes>>, routerify::Error> {
+async fn about_handler(_: Request<Incoming>) -> Result<Response<Full<Bytes>>, routerify_ng::Error> {
     Ok(Response::new(Full::from("About page")))
 }
 
-// Define an error handler function which will accept the `routerify::RouteError`
+// Define an error handler function which will accept the `routerify_ng::RouteError`
 // and generates an appropriate response.
-async fn error_handler(err: routerify::RouteError) -> Response<Full<Bytes>> {
+async fn error_handler(err: routerify_ng::RouteError) -> Response<Full<Bytes>> {
     Response::builder()
         .status(StatusCode::INTERNAL_SERVER_ERROR)
         .body(Full::from(err.to_string()))
         .unwrap()
 }
 
-fn router() -> Router<routerify::Error> {
+fn router() -> Router<routerify_ng::Error> {
     // Create a router and specify the the handlers.
     Router::builder()
         .get("/", home_handler)

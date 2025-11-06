@@ -6,7 +6,7 @@ use hyper::{Request, Response, StatusCode};
 use hyper_util::rt::TokioExecutor;
 use hyper_util::rt::TokioIo;
 use hyper_util::server::conn::auto::Builder;
-use routerify::{Router, RouterService};
+use routerify_ng::{Router, RouterService};
 use std::io;
 use std::net::SocketAddr;
 use std::sync::Arc;

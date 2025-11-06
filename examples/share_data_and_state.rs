@@ -7,8 +7,8 @@ use hyper_util::rt::TokioExecutor;
 use hyper_util::rt::TokioIo;
 use hyper_util::server::conn::auto::Builder;
 // Import the routerify prelude traits.
-use routerify::prelude::*;
-use routerify::{Middleware, RequestInfo, Router, RouterService};
+use routerify_ng::prelude::*;
+use routerify_ng::{Middleware, RequestInfo, Router, RouterService};
 use std::sync::Arc;
 use std::{convert::Infallible, net::SocketAddr};
 use tokio::net::TcpListener;
@@ -37,9 +37,9 @@ async fn logger(req: Request<Incoming>) -> Result<Request<Incoming>, Infallible>
     Ok(req)
 }
 
-// Define an error handler function which will accept the `routerify::Error`
+// Define an error handler function which will accept the `routerify_ng::Error`
 // and the request information and generates an appropriate response.
-async fn error_handler(err: routerify::RouteError, req_info: RequestInfo) -> Response<Full<Bytes>> {
+async fn error_handler(err: routerify_ng::RouteError, req_info: RequestInfo) -> Response<Full<Bytes>> {
     // You can also access the same state from error handler.
     let state = req_info.data::<State>().unwrap();
     println!("State value: {}", state.0);

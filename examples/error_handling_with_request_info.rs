@@ -5,7 +5,7 @@ use hyper::service::Service;
 use hyper::{header, Request, Response, StatusCode};
 use hyper_util::rt::{TokioExecutor, TokioIo};
 use hyper_util::server::conn::auto::Builder;
-use routerify::{RequestInfo, Router, RouterService};
+use routerify_ng::{RequestInfo, Router, RouterService};
 use std::io;
 use std::net::SocketAddr;
 use std::sync::Arc;
@@ -21,9 +21,9 @@ async fn about_handler(_: Request<Incoming>) -> Result<Response<Full<Bytes>>, io
     Ok(Response::new(Full::from("About page")))
 }
 
-// Define an error handler function which will accept the `routerify::Error` and the `req_info`
+// Define an error handler function which will accept the `routerify_ng::Error` and the `req_info`
 // and generates an appropriate response.
-async fn error_handler(err: routerify::RouteError, req_info: RequestInfo) -> Response<Full<Bytes>> {
+async fn error_handler(err: routerify_ng::RouteError, req_info: RequestInfo) -> Response<Full<Bytes>> {
     eprintln!("{}", err);
 
     // Access a cookie.

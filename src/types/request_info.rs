@@ -83,8 +83,8 @@ impl RequestInfo {
     /// use http_body_util::Full;
     /// use hyper::body::Incoming;
     /// use hyper::{body::Bytes, Request, Response};
-    /// use routerify::ext::RequestExt;
-    /// use routerify::{Middleware, RequestInfo, Router};
+    /// use routerify_ng::ext::RequestExt;
+    /// use routerify_ng::{Middleware, RequestInfo, Router};
     /// use std::convert::Infallible;
     ///
     /// fn run() -> Router<Infallible> {

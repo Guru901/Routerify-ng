@@ -1,13 +1,13 @@
+use crate::Error;
+use crate::RouteError;
 use crate::constants;
 use crate::data_map::ScopedDataMap;
 use crate::middleware::{PostMiddleware, PreMiddleware};
 use crate::route::Route;
 use crate::types::RequestInfo;
-use crate::Error;
-use crate::RouteError;
 use http_body_util::Full;
 use hyper::body::Bytes;
-use hyper::{header, Method, Request, Response, StatusCode};
+use hyper::{Method, Request, Response, StatusCode, header};
 use regex::RegexSet;
 use std::any::Any;
 use std::fmt::{self, Debug, Formatter};
@@ -46,7 +46,7 @@ pub(crate) type ErrHandlerWithInfoReturn = Box<dyn Future<Output = Response<Full
 ///     body::{Bytes, Incoming},
 ///     Request, Response,
 /// };
-/// use routerify::Router;
+/// use routerify_ng::Router;
 ///
 /// // A handler for "/about" page.
 /// // We will use hyper::Body as response body type and hyper::Error as error type.
@@ -84,8 +84,8 @@ pub(crate) enum ErrHandler {
 impl ErrHandler {
     pub(crate) async fn execute(&self, err: RouteError, req_info: Option<RequestInfo>) -> Response<Full<Bytes>> {
         match self {
-            ErrHandler::WithoutInfo(ref err_handler) => Pin::from(err_handler(err)).await,
-            ErrHandler::WithInfo(ref err_handler) => {
+            ErrHandler::WithoutInfo(err_handler) => Pin::from(err_handler(err)).await,
+            ErrHandler::WithInfo(err_handler) => {
                 Pin::from(err_handler(err, req_info.expect("No RequestInfo is provided"))).await
             }
         }

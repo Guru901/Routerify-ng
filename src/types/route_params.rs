@@ -32,8 +32,8 @@ impl RouteParams {
     /// ```
     /// use http_body_util::Full;
     /// use hyper::{body::Bytes, Response};
-    /// use routerify::ext::RequestExt;
-    /// use routerify::{RouteParams, Router};
+    /// use routerify_ng::ext::RequestExt;
+    /// use routerify_ng::{RouteParams, Router};
     /// use std::convert::Infallible;
     ///
     /// fn run() -> Router<Infallible> {
@@ -65,8 +65,8 @@ impl RouteParams {
     /// ```
     /// use http_body_util::Full;
     /// use hyper::{body::Bytes, Response};
-    /// use routerify::ext::RequestExt;
-    /// use routerify::{RouteParams, Router};
+    /// use routerify_ng::ext::RequestExt;
+    /// use routerify_ng::{RouteParams, Router};
     /// use std::convert::Infallible;
     ///
     /// fn run() -> Router<Infallible> {

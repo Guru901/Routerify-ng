@@ -6,7 +6,7 @@ use hyper_util::rt::TokioExecutor;
 use hyper_util::rt::TokioIo;
 use hyper_util::server::conn::auto::Builder;
 // Import the routerify prelude traits.
-use routerify::{Router, RouterService};
+use routerify_ng::{Router, RouterService};
 use std::io;
 use std::net::SocketAddr;
 use std::sync::Arc;
@@ -15,7 +15,7 @@ use tokio::net::TcpListener;
 mod users {
     use http::Request;
     use hyper::body::Incoming;
-    use routerify::ext::RequestExt;
+    use routerify_ng::ext::RequestExt;
     use std::sync::Mutex;
 
     use super::*;
@@ -43,7 +43,7 @@ mod offers {
 
     use http::Request;
     use hyper::body::Incoming;
-    use routerify::ext::RequestExt;
+    use routerify_ng::ext::RequestExt;
 
     use super::*;
 

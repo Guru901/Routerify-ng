@@ -26,21 +26,20 @@ Routerify's core features:
 - 🔥 Route handlers and middleware [may share state](https://github.com/routerify/routerify/blob/master/examples/share_data_and_state.rs)
 - 🍗 [Extensive documentation](https://docs.rs/routerify/) and [examples](https://github.com/routerify/routerify/tree/master/examples)
 
-
 To generate a quick server app using [Routerify](https://github.com/routerify/routerify) and [hyper](https://hyper.rs/), please check out [hyper-routerify-server-template](https://github.com/routerify/hyper-routerify-server-template).
 
-*Compiler support: requires rustc 1.48+*
+_Compiler support: requires rustc 1.48+_
 
 ## Benchmarks
 
-| Framework      | Language    | Requests/sec |
-|----------------|-------------|--------------|
-| [hyper v0.14](https://github.com/hyperium/hyper) | Rust 1.50.0 | 144,583 |
-| [routerify v2.0.0](https://github.com/routerify/routerify) with [hyper v0.14](https://github.com/hyperium/hyper) | Rust 1.50.0 | 144,621 |
-| [actix-web v3](https://github.com/actix/actix-web) | Rust 1.50.0 | 131,292 |
-| [warp v0.3](https://github.com/seanmonstar/warp) | Rust 1.50.0 | 145,362 |
-| [go-httprouter, branch master](https://github.com/julienschmidt/httprouter) | Go 1.16 | 130,662 |
-| [Rocket, branch master](https://github.com/SergioBenitez/Rocket) | Rust 1.50.0 | 130,045 |
+| Framework                                                                                                        | Language    | Requests/sec |
+| ---------------------------------------------------------------------------------------------------------------- | ----------- | ------------ |
+| [hyper v0.14](https://github.com/hyperium/hyper)                                                                 | Rust 1.50.0 | 144,583      |
+| [routerify v2.0.0](https://github.com/routerify/routerify) with [hyper v0.14](https://github.com/hyperium/hyper) | Rust 1.50.0 | 144,621      |
+| [actix-web v3](https://github.com/actix/actix-web)                                                               | Rust 1.50.0 | 131,292      |
+| [warp v0.3](https://github.com/seanmonstar/warp)                                                                 | Rust 1.50.0 | 145,362      |
+| [go-httprouter, branch master](https://github.com/julienschmidt/httprouter)                                      | Go 1.16     | 130,662      |
+| [Rocket, branch master](https://github.com/SergioBenitez/Rocket)                                                 | Rust 1.50.0 | 130,045      |
 
 For more info, please visit [Benchmarks](https://github.com/routerify/routerify-benchmark).
 
@@ -62,8 +61,8 @@ A simple example using `Routerify` with `hyper` would look like the following:
 ```rust
 use hyper::{Body, Request, Response, Server, StatusCode};
 // Import the routerify prelude traits.
-use routerify::prelude::*;
-use routerify::{Middleware, Router, RouterService, RequestInfo};
+use routerify_ng::prelude::*;
+use routerify_ng::{Middleware, Router, RouterService, RequestInfo};
 use std::{convert::Infallible, net::SocketAddr};
 
 // Define an app state to share it across the route handlers and middlewares.
@@ -90,9 +89,9 @@ async fn logger(req: Request<Body>) -> Result<Request<Body>, Infallible> {
     Ok(req)
 }
 
-// Define an error handler function which will accept the `routerify::Error`
+// Define an error handler function which will accept the `routerify_ng::Error`
 // and the request information and generates an appropriate response.
-async fn error_handler(err: routerify::RouteError, _: RequestInfo) -> Response<Body> {
+async fn error_handler(err: routerify_ng::RouteError, _: RequestInfo) -> Response<Body> {
     eprintln!("{}", err);
     Response::builder()
         .status(StatusCode::INTERNAL_SERVER_ERROR)

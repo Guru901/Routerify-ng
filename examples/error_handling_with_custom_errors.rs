@@ -6,7 +6,7 @@ use hyper::{Request, Response, StatusCode};
 use hyper_util::rt::TokioExecutor;
 use hyper_util::rt::TokioIo;
 use hyper_util::server::conn::auto::Builder;
-use routerify::{Router, RouterService};
+use routerify_ng::{Router, RouterService};
 use std::fmt;
 use std::net::SocketAddr;
 use std::sync::Arc;
@@ -40,10 +40,10 @@ async fn home_handler(_: Request<Incoming>) -> Result<Response<Full<Bytes>>, Api
     Err(ApiError::Generic("Something went wrong!".into()))
 }
 
-// Define an error handler function which will accept the `routerify::RouteError`
+// Define an error handler function which will accept the `routerify_ng::RouteError`
 // and generates an appropriate response.
-async fn error_handler(err: routerify::RouteError) -> Response<Full<Bytes>> {
-    // Because `routerify::RouteError` is a boxed error, it must be
+async fn error_handler(err: routerify_ng::RouteError) -> Response<Full<Bytes>> {
+    // Because `routerify_ng::RouteError` is a boxed error, it must be
     // downcasted first. Unwrap for simplicity.
     let api_err = err.downcast::<ApiError>().unwrap();
 

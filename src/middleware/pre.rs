@@ -1,5 +1,5 @@
-use crate::regex_generator::generate_exact_match_regex;
 use crate::Error;
+use crate::regex_generator::generate_exact_match_regex;
 use hyper::Request;
 use regex::Regex;
 use std::fmt::{self, Debug, Formatter};
@@ -52,7 +52,7 @@ impl<E: Into<Box<dyn std::error::Error + Send + Sync>> + 'static> PreMiddleware<
     /// # Examples
     ///
     /// ```
-    /// use routerify::{Middleware, PreMiddleware, Router};
+    /// use routerify_ng::{Middleware, PreMiddleware, Router};
     /// use std::convert::Infallible;
 
     /// fn run() -> Router<Infallible> {

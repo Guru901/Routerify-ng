@@ -7,8 +7,8 @@ use hyper_util::rt::TokioExecutor;
 use hyper_util::rt::TokioIo;
 use hyper_util::server::conn::auto::Builder;
 // Import the routerify prelude traits.
-use routerify::prelude::*;
-use routerify::{Middleware, Router, RouterService};
+use routerify_ng::prelude::*;
+use routerify_ng::{Middleware, Router, RouterService};
 use std::{convert::Infallible, net::SocketAddr, sync::Arc};
 use tokio::net::TcpListener;
 

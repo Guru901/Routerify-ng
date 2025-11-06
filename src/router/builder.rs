@@ -29,7 +29,7 @@ use std::sync::Arc;
 ///     body::{Bytes, Incoming},
 ///     Request, Response,
 /// };
-/// use routerify::{Middleware, Router};
+/// use routerify_ng::{Middleware, Router};
 ///
 /// async fn home_handler(req: Request<Incoming>) -> Result<Response<Full<Bytes>>, hyper::Error> {
 ///     Ok(Response::new(Full::new(Bytes::from("home"))))
@@ -119,7 +119,7 @@ impl<E: Into<Box<dyn std::error::Error + Send + Sync>> + 'static> RouterBuilder<
     ///     body::{Bytes, Incoming},
     ///     Request, Response,
     /// };
-    /// use routerify::Router;
+    /// use routerify_ng::Router;
     ///
     /// async fn home_handler(req: Request<Incoming>) -> Result<Response<Full<Bytes>>, hyper::Error> {
     ///     Ok(Response::new(Full::new(Bytes::from("home"))))
@@ -149,7 +149,7 @@ impl<E: Into<Box<dyn std::error::Error + Send + Sync>> + 'static> RouterBuilder<
     ///     body::{Bytes, Incoming},
     ///     Request, Response,
     /// };
-    /// use routerify::Router;
+    /// use routerify_ng::Router;
 
     /// async fn home_handler(req: Request<Incoming>) -> Result<Response<Full<Bytes>>, hyper::Error> {
     ///     Ok(Response::new(Full::new(Bytes::from("home"))))
@@ -179,7 +179,7 @@ impl<E: Into<Box<dyn std::error::Error + Send + Sync>> + 'static> RouterBuilder<
     ///     body::{Bytes, Incoming},
     ///     Request, Response,
     /// };
-    /// use routerify::Router;
+    /// use routerify_ng::Router;
 
     /// async fn file_upload_handler(req: Request<Incoming>) -> Result<Response<Full<Bytes>>, hyper::Error> {
     ///     Ok(Response::new(Full::new(Bytes::from("File uploader"))))
@@ -209,7 +209,7 @@ impl<E: Into<Box<dyn std::error::Error + Send + Sync>> + 'static> RouterBuilder<
     //     body::{Bytes, Incoming},
     //     Request, Response,
     // };
-    // use routerify::Router;
+    // use routerify_ng::Router;
 
     // async fn file_upload_handler(req: Request<Incoming>) -> Result<Response<Full<Bytes>>, hyper::Error> {
     //     Ok(Response::new(Full::new(Bytes::from("File uploader"))))
@@ -239,7 +239,7 @@ impl<E: Into<Box<dyn std::error::Error + Send + Sync>> + 'static> RouterBuilder<
     ///      body::{Bytes, Incoming},
     ///      Request, Response,
     ///  };
-    ///  use routerify::Router;
+    ///  use routerify_ng::Router;
     ///  
     ///  async fn delete_file_handler(req: Request<Incoming>) -> Result<Response<Full<Bytes>>, hyper::Error> {
     ///      Ok(Response::new(Full::new(Bytes::from("Delete file"))))
@@ -272,7 +272,7 @@ impl<E: Into<Box<dyn std::error::Error + Send + Sync>> + 'static> RouterBuilder<
     ///     body::{Bytes, Incoming},
     ///     Request, Response,
     /// };
-    /// use routerify::Router;
+    /// use routerify_ng::Router;
 
     /// async fn a_head_handler(req: Request<Incoming>) -> Result<Response<Full<Bytes>>, hyper::Error> {
     ///     Ok(Response::new(Full::new(Bytes::new())))
@@ -302,7 +302,7 @@ impl<E: Into<Box<dyn std::error::Error + Send + Sync>> + 'static> RouterBuilder<
     ///     body::{Bytes, Incoming},
     ///     Request, Response,
     /// };
-    /// use routerify::Router;
+    /// use routerify_ng::Router;
     ///
     /// async fn trace_handler(req: Request<Incoming>) -> Result<Response<Full<Bytes>>, hyper::Error> {
     ///     Ok(Response::new(Full::new(Bytes::new())))
@@ -332,7 +332,7 @@ impl<E: Into<Box<dyn std::error::Error + Send + Sync>> + 'static> RouterBuilder<
     ///     body::{Bytes, Incoming},
     ///     Request, Response,
     /// };
-    /// use routerify::Router;
+    /// use routerify_ng::Router;
     ///
     /// async fn connect_handler(req: Request<Incoming>) -> Result<Response<Full<Bytes>>, hyper::Error> {
     ///     Ok(Response::new(Full::new(Bytes::new())))
@@ -362,7 +362,7 @@ impl<E: Into<Box<dyn std::error::Error + Send + Sync>> + 'static> RouterBuilder<
     ///     body::{Bytes, Incoming},
     ///     Request, Response,
     /// };
-    /// use routerify::Router;
+    /// use routerify_ng::Router;
     ///
     /// async fn update_data_handler(req: Request<Incoming>) -> Result<Response<Full<Bytes>>, hyper::Error> {
     ///     Ok(Response::new((Full::new(Bytes::from("Data updater")))))
@@ -395,7 +395,7 @@ impl<E: Into<Box<dyn std::error::Error + Send + Sync>> + 'static> RouterBuilder<
     ///     body::{Bytes, Incoming},
     ///     Request, Response,
     /// };
-    /// use routerify::Router;
+    /// use routerify_ng::Router;
     ///
     /// async fn options_handler(req: Request<Incoming>) -> Result<Response<Full<Bytes>>, hyper::Error> {
     ///     Ok(Response::new(Full::new(Bytes::new())))
@@ -426,7 +426,7 @@ impl<E: Into<Box<dyn std::error::Error + Send + Sync>> + 'static> RouterBuilder<
     ///     body::{Bytes, Incoming},
     ///     Request, Response, StatusCode,
     /// };
-    /// use routerify::Router;
+    /// use routerify_ng::Router;
     ///
     /// async fn home_handler(req: Request<Incoming>) -> Result<Response<Full<Bytes>>, hyper::Error> {
     ///     Ok(Response::new(Full::new(Bytes::from("home"))))
@@ -466,7 +466,7 @@ impl<E: Into<Box<dyn std::error::Error + Send + Sync>> + 'static> RouterBuilder<
     ///     body::{Bytes, Incoming},
     ///     Request, Response,
     /// };
-    /// use routerify::Router;
+    /// use routerify_ng::Router;
     ///
     /// async fn home_handler(req: Request<Incoming>) -> Result<Response<Full<Bytes>>, hyper::Error> {
     ///     Ok(Response::new(Full::new(Bytes::from("home"))))
@@ -500,7 +500,7 @@ impl<E: Into<Box<dyn std::error::Error + Send + Sync>> + 'static> RouterBuilder<
     ///     body::{Bytes, Incoming},
     ///     Method, Request, Response,
     /// };
-    /// use routerify::Router;
+    /// use routerify_ng::Router;
     ///
     /// async fn cart_checkout_handler(req: Request<Incoming>) -> Result<Response<Full<Bytes>>, hyper::Error> {
     ///     Ok(Response::new(Full::new(Bytes::from(
@@ -541,11 +541,11 @@ impl<E: Into<Box<dyn std::error::Error + Send + Sync>> + 'static> RouterBuilder<
     /// # Examples
     ///
     /// ```
-    /// use routerify::Router;
+    /// use routerify_ng::Router;
     /// mod api {
     ///     use http_body_util::Full;
     ///     use hyper::{body::Bytes, Response};
-    ///     use routerify::Router;
+    ///     use routerify_ng::Router;
     ///
     ///     pub fn router() -> Router<hyper::Error> {
     ///         Router::builder()
@@ -662,7 +662,7 @@ impl<E: Into<Box<dyn std::error::Error + Send + Sync>> + 'static> RouterBuilder<
     ///
     /// ```
     /// use hyper::{Request, Response};
-    /// use routerify::{Middleware, Router};
+    /// use routerify_ng::{Middleware, Router};
     /// use std::convert::Infallible;
     ///
     /// fn run() -> Router<Infallible> {

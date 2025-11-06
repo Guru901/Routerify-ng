@@ -5,8 +5,8 @@ use hyper::service::Service;
 use hyper::{Request, Response, StatusCode};
 use hyper_util::rt::{TokioExecutor, TokioIo};
 use hyper_util::server::conn::auto::Builder;
-use routerify::prelude::*;
-use routerify::{Middleware, RequestInfo, Router, RouterService};
+use routerify_ng::prelude::*;
+use routerify_ng::{Middleware, RequestInfo, Router, RouterService};
 use std::net::SocketAddr;
 use std::sync::Arc;
 use tokio::net::TcpListener;
@@ -14,7 +14,7 @@ use tokio::net::TcpListener;
 #[derive(Clone)]
 pub struct State(pub i32);
 
-pub async fn pre_middleware(req: Request<Incoming>) -> Result<Request<Incoming>, routerify::Error> {
+pub async fn pre_middleware(req: Request<Incoming>) -> Result<Request<Incoming>, routerify_ng::Error> {
     let data = req.data::<State>().map(|s| s.0).unwrap_or(0);
     println!("Pre Data: {}", data);
     println!("Pre Data2: {:?}", req.data::<u32>());
@@ -25,22 +25,22 @@ pub async fn pre_middleware(req: Request<Incoming>) -> Result<Request<Incoming>,
 pub async fn post_middleware(
     res: Response<Full<Bytes>>,
     req_info: RequestInfo,
-) -> Result<Response<Full<Bytes>>, routerify::Error> {
+) -> Result<Response<Full<Bytes>>, routerify_ng::Error> {
     let data = req_info.data::<State>().map(|s| s.0).unwrap_or(0);
     println!("Post Data: {}", data);
 
     Ok(res)
 }
 
-pub async fn home_handler(req: Request<Incoming>) -> Result<Response<Full<Bytes>>, routerify::Error> {
+pub async fn home_handler(req: Request<Incoming>) -> Result<Response<Full<Bytes>>, routerify_ng::Error> {
     let data = req.data::<State>().map(|s| s.0).unwrap_or(0);
     println!("Route Data: {}", data);
     println!("Route Data2: {:?}", req.data::<u32>());
 
-    Err(routerify::Error::new("Error"))
+    Err(routerify_ng::Error::new("Error"))
 }
 
-async fn error_handler(err: routerify::RouteError, req_info: RequestInfo) -> Response<Full<Bytes>> {
+async fn error_handler(err: routerify_ng::RouteError, req_info: RequestInfo) -> Response<Full<Bytes>> {
     let data = req_info.data::<State>().map(|s| s.0).unwrap_or(0);
     println!("Error Data: {}", data);
     println!("Error Data2: {:?}", req_info.data::<u32>());
@@ -52,7 +52,7 @@ async fn error_handler(err: routerify::RouteError, req_info: RequestInfo) -> Res
         .unwrap()
 }
 
-fn router2() -> Router<routerify::Error> {
+fn router2() -> Router<routerify_ng::Error> {
     Router::builder()
         .data(111_u32)
         .get("/a", |req: Request<Incoming>| async move {
@@ -65,7 +65,7 @@ fn router2() -> Router<routerify::Error> {
         .unwrap()
 }
 
-fn router3() -> Router<routerify::Error> {
+fn router3() -> Router<routerify_ng::Error> {
     Router::builder()
         .data(555_u32)
         .get("/h/g/j", |req: Request<Incoming>| async move {
@@ -80,7 +80,7 @@ fn router3() -> Router<routerify::Error> {
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
-    let router: Router<routerify::Error> = Router::builder()
+    let router: Router<routerify_ng::Error> = Router::builder()
         .data(State(100))
         .scope("/r", router2())
         .scope("/bcd", router3())

@@ -1,7 +1,7 @@
 use crate::data_map::SharedDataMap;
 use crate::types::{RequestContext, RequestMeta, RouteParams};
-use hyper::body::Incoming;
 use hyper::Request;
+use hyper::body::Incoming;
 use std::net::SocketAddr;
 
 /// A extension trait which extends the [`hyper::Request`](https://docs.rs/hyper/0.14.4/hyper/struct.Request.html) and [`http::Parts`](https://docs.rs/http/0.2.4/http/request/struct.Parts.html) types with some helpful methods.
@@ -13,8 +13,8 @@ pub trait RequestExt {
     /// ```
     /// use http_body_util::Full;
     /// use hyper::{body::Bytes, Response};
-    /// use routerify::ext::RequestExt;
-    /// use routerify::{RouteParams, Router};
+    /// use routerify_ng::ext::RequestExt;
+    /// use routerify_ng::{RouteParams, Router};
     /// use std::convert::Infallible;
     ///
     /// fn run() -> Router<Infallible> {
@@ -45,8 +45,8 @@ pub trait RequestExt {
     /// use http_body_util::Full;
     /// use hyper::body::Bytes;
     /// use hyper::Response;
-    /// use routerify::ext::RequestExt;
-    /// use routerify::Router;
+    /// use routerify_ng::ext::RequestExt;
+    /// use routerify_ng::Router;
     /// use std::convert::Infallible;
     ///
     /// fn run() -> Router<Infallible> {
@@ -73,8 +73,8 @@ pub trait RequestExt {
     ///
     /// ```use http_body_util::Full;
     /// use hyper::{body::Bytes, Response};
-    /// use routerify::ext::RequestExt;
-    /// use routerify::Router;
+    /// use routerify_ng::ext::RequestExt;
+    /// use routerify_ng::Router;
     /// use std::convert::Infallible;
     ///
     /// fn run() -> Router<Infallible> {
@@ -111,8 +111,8 @@ pub trait RequestExt {
     /// use http_body_util::Full;
     /// use hyper::body::Incoming;
     /// use hyper::{body::Bytes, Request, Response};
-    /// use routerify::ext::RequestExt;
-    /// use routerify::{Middleware, Router};
+    /// use routerify_ng::ext::RequestExt;
+    /// use routerify_ng::{Middleware, Router};
     /// use std::convert::Infallible;
     ///
     /// fn run() -> Router<Infallible> {

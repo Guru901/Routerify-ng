@@ -1,7 +1,7 @@
+use crate::Error;
 use crate::helpers;
 use crate::regex_generator::generate_exact_match_regex;
 use crate::types::{RequestMeta, RouteParams};
-use crate::Error;
 use http_body_util::Full;
 use hyper::body::Bytes;
 use hyper::{Method, Request, Response};
@@ -33,7 +33,7 @@ type HandlerReturn<E> = Box<dyn Future<Output = Result<Response<Full<Bytes>>, E>
 ///     body::{Bytes, Incoming},
 ///     Request, Response,
 /// };
-/// use routerify::Router;
+/// use routerify_ng::Router;
 ///
 /// async fn home_handler(req: Request<Incoming>) -> Result<Response<Full<Bytes>>, hyper::Error> {
 ///     Ok(Response::new(Full::new(Bytes::from("home"))))

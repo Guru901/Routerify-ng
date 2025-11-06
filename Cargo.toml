@@ -1,15 +1,15 @@
 [package]
-name = "routerify"
-version = "3.0.0"
+name = "routerify_ng"
+version = "0.1.0"
 description = "A lightweight, idiomatic, composable and modular router implementation with middleware support for the Rust HTTP library hyper.rs."
-homepage = "https://github.com/routerify/routerify"
-repository = "https://github.com/routerify/routerify"
+homepage = "https://github.com/guru901/routerify_ng"
+repository = "https://github.com/guru901/routerify_ng"
 keywords = ["hyper", "hyper-rs", "router", "routing", "middleware"]
 categories = ["asynchronous", "web-programming", "web-programming::http-server"]
-authors = ["Rousan Ali <hello@rousan.io>"]
+authors = ["Gurvinder Singh <guru911u@gmail.com>"]
 readme = "README.md"
 license = "MIT"
-edition = "2018"
+edition = "2024"
 
 [package.metadata.docs.rs]
 all-features = true
@@ -36,10 +36,3 @@ bytes = "1"
 [dev-dependencies]
 tokio = { version = "1", features = ["full"] }
 futures = { version = "0.3" }
-
-# For the AWS Lambda example
-# aws_lambda_events = "0.4.0"
-# lambda_http = { package = "netlify_lambda_http", version = "0.2.0" }
-# slog = "2"
-# sloggers = "1.0"
-# url = "2"

@@ -16,7 +16,7 @@ impl Error {
         Error { msg: msg.into() }
     }
 
-    /// Converts other error type to the `routerify::Error` type.
+    /// Converts other error type to the `routerify_ng::Error` type.
     pub fn wrap<E: std::error::Error + Send + Sync + 'static>(err: E) -> Self {
         Error { msg: err.to_string() }
     }
@@ -24,13 +24,13 @@ impl Error {
 
 impl Display for Error {
     fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
-        write!(f, "routerify::Error: {}", self.msg)
+        write!(f, "routerify_ng::Error: {}", self.msg)
     }
 }
 
 impl Debug for Error {
     fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
-        write!(f, "routerify::Error: {}", self.msg)
+        write!(f, "routerify_ng::Error: {}", self.msg)
     }
 }
 

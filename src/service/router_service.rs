@@ -2,7 +2,7 @@ use crate::router::Router;
 use crate::service::request_service::{RequestService, RequestServiceBuilder};
 use hyper::service::Service;
 use std::convert::Infallible;
-use std::future::{ready, Ready};
+use std::future::{Ready, ready};
 use tokio::net::TcpStream;
 
 /// A [`Service`](https://docs.rs/hyper/0.14.4/hyper/service/trait.Service.html) to process incoming requests.
@@ -25,7 +25,7 @@ use tokio::net::TcpStream;
 /// use hyper_util::rt::TokioExecutor;
 /// use hyper_util::rt::TokioIo;
 /// use hyper_util::server::conn::auto::Builder;
-/// use routerify::{Router, RouterService};
+/// use routerify_ng::{Router, RouterService};
 /// use std::convert::Infallible;
 /// use std::net::SocketAddr;
 /// use std::sync::Arc;

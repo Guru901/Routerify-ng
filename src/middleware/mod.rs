@@ -1,7 +1,7 @@
 use crate::types::RequestInfo;
 use http_body_util::Full;
-use hyper::body::Bytes;
 use hyper::Response;
+use hyper::body::Bytes;
 use std::future::Future;
 
 pub use self::post::PostMiddleware;
@@ -33,7 +33,7 @@ impl<E: Into<Box<dyn std::error::Error + Send + Sync>> + 'static> Middleware<E> 
     /// # Examples
     ///
     /// ```
-    /// use routerify::{Middleware, Router};
+    /// use routerify_ng::{Middleware, Router};
     /// use std::convert::Infallible;
     ///
     /// fn run() -> Router<Infallible> {
@@ -60,7 +60,7 @@ impl<E: Into<Box<dyn std::error::Error + Send + Sync>> + 'static> Middleware<E> 
     /// # Examples
     ///
     /// ```
-    /// use routerify::{Middleware, Router};
+    /// use routerify_ng::{Middleware, Router};
     /// use std::convert::Infallible;
     ///
     /// fn run() -> Router<Infallible> {
@@ -90,7 +90,7 @@ impl<E: Into<Box<dyn std::error::Error + Send + Sync>> + 'static> Middleware<E> 
     /// ```
     /// use http_body_util::Full;
     /// use hyper::{body::Bytes, Response};
-    /// use routerify::{Middleware, RequestInfo, Router};
+    /// use routerify_ng::{Middleware, RequestInfo, Router};
     /// use std::convert::Infallible;
     ///
     /// async fn post_middleware_with_info_handler(
@@ -125,7 +125,7 @@ impl<E: Into<Box<dyn std::error::Error + Send + Sync>> + 'static> Middleware<E> 
     /// # Examples
     ///
     /// ```
-    ///    use routerify::{Middleware, Router};
+    ///    use routerify_ng::{Middleware, Router};
     ///    use std::convert::Infallible;
     ///    
     ///    fn run() -> Router<Infallible> {
@@ -156,7 +156,7 @@ impl<E: Into<Box<dyn std::error::Error + Send + Sync>> + 'static> Middleware<E> 
     /// # Examples
     ///
     /// ```
-    /// use routerify::{Middleware, Router};
+    /// use routerify_ng::{Middleware, Router};
     /// use std::convert::Infallible;
     ///
     /// fn run() -> Router<Infallible> {
@@ -189,7 +189,7 @@ impl<E: Into<Box<dyn std::error::Error + Send + Sync>> + 'static> Middleware<E> 
     ///
     /// ```
     /// use http_body_util::Full;
-    /// use routerify::{Middleware, RequestInfo, Router};
+    /// use routerify_ng::{Middleware, RequestInfo, Router};
     /// use std::convert::Infallible;
     /// use hyper::{Response, body::Bytes};
     ///
