@@ -124,7 +124,9 @@ impl<E: Into<Box<dyn std::error::Error + Send + Sync>> + 'static> Route<E> {
 
         let mut route_params = RouteParams::with_capacity(ln);
 
-        if ln > 0 && let Some(caps) = self.regex.captures(target_path) {
+        if ln > 0
+            && let Some(caps) = self.regex.captures(target_path)
+        {
             let mut iter = caps.iter();
             // Skip the first match because it's the whole path.
             iter.next();
