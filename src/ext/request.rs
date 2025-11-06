@@ -33,7 +33,6 @@ pub trait RequestExt {
     ///         .unwrap();
     ///     router
     /// }
-
     /// ```
     fn params(&self) -> &RouteParams;
 
@@ -142,7 +141,7 @@ fn params(ext: &http::Extensions) -> &RouteParams {
 }
 
 fn param<P: Into<String>>(ext: &http::Extensions, param_name: P) -> Option<&String> {
-    params(ext).get(&param_name.into())
+    params(ext).get(param_name.into())
 }
 
 fn remote_addr(ext: &http::Extensions) -> SocketAddr {

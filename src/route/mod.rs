@@ -124,15 +124,13 @@ impl<E: Into<Box<dyn std::error::Error + Send + Sync>> + 'static> Route<E> {
 
         let mut route_params = RouteParams::with_capacity(ln);
 
-        if ln > 0 {
-            if let Some(caps) = self.regex.captures(target_path) {
-                let mut iter = caps.iter();
-                // Skip the first match because it's the whole path.
-                iter.next();
-                for param in route_params_list {
-                    if let Some(Some(g)) = iter.next() {
-                        route_params.set(param.clone(), g.as_str());
-                    }
+        if ln > 0 && let Some(caps) = self.regex.captures(target_path) {
+            let mut iter = caps.iter();
+            // Skip the first match because it's the whole path.
+            iter.next();
+            for param in route_params_list {
+                if let Some(Some(g)) = iter.next() {
+                    route_params.set(param.clone(), g.as_str());
                 }
             }
         }

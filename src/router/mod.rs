@@ -277,10 +277,8 @@ impl<E: Into<Box<dyn std::error::Error + Send + Sync>> + 'static> Router<E> {
             .map(|idx| self.scoped_data_maps[idx].clone_data_map())
             .collect::<Vec<_>>();
 
-        if let Some(ref mut req_info) = req_info {
-            if !shared_data_maps.is_empty() {
-                req_info.shared_data_maps.replace(shared_data_maps.clone());
-            }
+        if let Some(ref mut req_info) = req_info && !shared_data_maps.is_empty() {
+            req_info.shared_data_maps.replace(shared_data_maps.clone());
         }
 
         let ext = req.extensions_mut();

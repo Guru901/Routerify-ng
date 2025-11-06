@@ -54,7 +54,6 @@ impl<E: Into<Box<dyn std::error::Error + Send + Sync>> + 'static> PreMiddleware<
     /// ```
     /// use routerify_ng::{Middleware, PreMiddleware, Router};
     /// use std::convert::Infallible;
-
     /// fn run() -> Router<Infallible> {
     ///     let router = Router::builder()
     ///         .middleware(Middleware::Pre(

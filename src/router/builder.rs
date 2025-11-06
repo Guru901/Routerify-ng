@@ -79,13 +79,12 @@ impl<E: Into<Box<dyn std::error::Error + Send + Sync>> + 'static> RouterBuilder<
             let scoped_data_maps = inner
                 .data_maps
                 .into_iter()
-                .map(|(path, data_map_arr)| {
+                .flat_map(|(path, data_map_arr)| {
                     data_map_arr
                         .into_iter()
                         .map(|data_map| ScopedDataMap::new(path.clone(), Arc::new(data_map)))
                         .collect::<Vec<crate::Result<ScopedDataMap>>>()
                 })
-                .flatten()
                 .collect::<Result<Vec<ScopedDataMap>, crate::RouteError>>()?;
 
             Ok(Router::new(
@@ -150,11 +149,9 @@ impl<E: Into<Box<dyn std::error::Error + Send + Sync>> + 'static> RouterBuilder<
     ///     Request, Response,
     /// };
     /// use routerify_ng::Router;
-
     /// async fn home_handler(req: Request<Incoming>) -> Result<Response<Full<Bytes>>, hyper::Error> {
     ///     Ok(Response::new(Full::new(Bytes::from("home"))))
     /// }
-
     /// fn run() -> Router<hyper::Error> {
     ///     let router = Router::builder().get_or_head("/", home_handler).build().unwrap();
     ///     router
@@ -180,11 +177,9 @@ impl<E: Into<Box<dyn std::error::Error + Send + Sync>> + 'static> RouterBuilder<
     ///     Request, Response,
     /// };
     /// use routerify_ng::Router;
-
     /// async fn file_upload_handler(req: Request<Incoming>) -> Result<Response<Full<Bytes>>, hyper::Error> {
     ///     Ok(Response::new(Full::new(Bytes::from("File uploader"))))
     /// }
-
     /// fn run() -> Router<hyper::Error> {
     ///     let router = Router::builder().post("/upload", file_upload_handler).build().unwrap();
     ///     router
@@ -210,11 +205,9 @@ impl<E: Into<Box<dyn std::error::Error + Send + Sync>> + 'static> RouterBuilder<
     //     Request, Response,
     // };
     // use routerify_ng::Router;
-
     // async fn file_upload_handler(req: Request<Incoming>) -> Result<Response<Full<Bytes>>, hyper::Error> {
     //     Ok(Response::new(Full::new(Bytes::from("File uploader"))))
     // }
-
     // fn run() -> Router<hyper::Error> {
     //     let router = Router::builder().put("/upload", file_upload_handler).build().unwrap();
     //     router
@@ -273,11 +266,9 @@ impl<E: Into<Box<dyn std::error::Error + Send + Sync>> + 'static> RouterBuilder<
     ///     Request, Response,
     /// };
     /// use routerify_ng::Router;
-
     /// async fn a_head_handler(req: Request<Incoming>) -> Result<Response<Full<Bytes>>, hyper::Error> {
     ///     Ok(Response::new(Full::new(Bytes::new())))
     /// }
-
     /// fn run() -> Router<hyper::Error> {
     ///     let router = Router::builder().head("/fetch-data", a_head_handler).build().unwrap();
     ///     router
@@ -578,7 +569,7 @@ impl<E: Into<Box<dyn std::error::Error + Send + Sync>> + 'static> RouterBuilder<
         let mut path = path.into();
 
         if path.ends_with('/') {
-            path = (&path[..path.len() - 1]).to_string();
+            path = path[..path.len() - 1].to_string();
         }
 
         let mut builder = self;
