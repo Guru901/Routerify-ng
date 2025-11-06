@@ -1,17 +1,9 @@
-<div align="center">
-  <a href="https://github.com/guru901/routerify-ng">
-    <img width="200" height="200" src="https://avatars.githubusercontent.com/u/64579326?s=200&v=4">
-  </a>
-  <br />
-  <br />
-</div>
+# Routerify-NG
 
 [![CI](https://github.com/guru901/routerify-ng/actions/workflows/ci.yml/badge.svg)](https://github.com/guru901/routerify-ng/actions)
 [![crates.io](https://img.shields.io/crates/v/routerify-ng.svg)](https://crates.io/crates/routerify-ng)
 [![Documentation](https://docs.rs/routerify-ng/badge.svg)](https://docs.rs/routerify-ng)
 [![License](https://img.shields.io/crates/l/routerify-ng.svg)](./LICENSE)
-
-# Routerify-NG
 
 **Routerify-NG** (Next Generation) is a modern, lightweight, idiomatic, and modular router for the Rust HTTP library [Hyper 1.x](https://hyper.rs/).  
 It’s a maintained and upgraded fork of the original [Routerify](https://github.com/routerify/routerify) rewritten for the new Hyper service model.
