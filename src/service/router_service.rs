@@ -1,7 +1,6 @@
 use crate::router::Router;
 use crate::service::request_service::{RequestService, RequestServiceBuilder};
-use http::Request;
-use hyper::body::{Body, Incoming};
+use hyper::body::Incoming;
 use hyper::service::Service;
 use std::convert::Infallible;
 use std::future::{Ready, ready};

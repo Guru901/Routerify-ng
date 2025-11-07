@@ -1,12 +1,9 @@
-use http_body_util::Full;
-use hyper::body::Body;
 use hyper::body::Bytes;
 use hyper::body::Incoming;
 use hyper::service::Service;
 use hyper_util::rt::TokioExecutor;
 use hyper_util::rt::TokioIo;
 use hyper_util::server::conn::auto::Builder;
-use routerify_ng::RequestService;
 use routerify_ng::{Router, RouterService};
 use std::net::SocketAddr;
 use std::sync::Arc;
@@ -22,11 +19,13 @@ impl Serve {
     pub fn addr(&self) -> SocketAddr {
         self.addr
     }
+
     pub fn new_request(&self, method: &str, route: &str) -> http::request::Builder {
         http::request::Request::builder()
             .method(method.to_ascii_uppercase().as_str())
             .uri(format!("http://{}{}", self.addr(), route))
     }
+
     pub fn shutdown(self) {
         self.tx.send(()).unwrap();
     }
@@ -39,22 +38,44 @@ where
     // Bind a TCP listener to an available port.
     let listener = Arc::new(TcpListener::bind("127.0.0.1:0").await.unwrap());
     let addr = listener.local_addr().unwrap();
+
     // Build the router service, which must be Arc to clone into spawned tasks.
     let router_service = Arc::new(RouterService::new(router).unwrap());
+
     let (tx, rx) = oneshot::channel::<()>();
+
+    // Spawn accept-loop handling connections.
+    let rx_fut = async move {
+        tokio::select! {
+            _ = rx => {
+                // Shutdown signal received
+            },
+        }
+    };
+
     let listener2 = listener.clone();
     let router_service2 = router_service.clone();
 
     tokio::spawn(async move {
-        loop {
-            let (stream, _) = listener2.accept().await.unwrap();
-            let router_service = router_service2.clone();
-            tokio::spawn(async move {
-                let request_service = router_service.call(&stream).await.expect("RouterService failed");
-                let io = TokioIo::new(stream);
-                let builder = Builder::new(TokioExecutor::new());
-                let conn = builder.serve_connection(io, request_service);
-            });
+        // Use select to allow for graceful shutdown
+        tokio::select! {
+            _ = async {
+                loop {
+                    let (stream, _) = listener2.accept().await.unwrap();
+                    let router_service = router_service2.clone();
+
+                    tokio::spawn(async move {
+                        let request_service = router_service.call(&stream).await.unwrap();
+                        let io = TokioIo::new(stream);
+
+                        let builder = Builder::new(TokioExecutor::new());
+                        if let Err(err) = builder.serve_connection(io, request_service).await {
+                            eprintln!("Error serving connection: {:?}", err);
+                        }
+                    });
+                }
+            } => {},
+            _ = rx_fut => {},
         }
     });
 
