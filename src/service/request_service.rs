@@ -67,8 +67,8 @@ pub struct RequestServiceBuilder<T, E> {
     router: Arc<Router<T, E>>,
 }
 
-impl<T: Body + 'static, E: Into<Box<dyn std::error::Error + Send + Sync>> + 'static> RequestServiceBuilder<T, E> {
-    pub fn new(mut router: Router<T, E>) -> crate::Result<Self> {
+impl<E: Into<Box<dyn std::error::Error + Send + Sync>> + 'static> RequestServiceBuilder<Incoming, E> {
+    pub fn new(mut router: Router<Incoming, E>) -> crate::Result<Self> {
         // router.init_keep_alive_middleware();
 
         router.init_global_options_route();
@@ -83,7 +83,31 @@ impl<T: Body + 'static, E: Into<Box<dyn std::error::Error + Send + Sync>> + 'sta
         })
     }
 
-    pub fn build(&self, remote_addr: SocketAddr) -> RequestService<T, E> {
+    pub fn build(&self, remote_addr: SocketAddr) -> RequestService<Incoming, E> {
+        RequestService {
+            router: self.router.clone(),
+            remote_addr,
+        }
+    }
+}
+
+impl<E: Into<Box<dyn std::error::Error + Send + Sync>> + 'static> RequestServiceBuilder<Empty<Bytes>, E> {
+    pub fn new(mut router: Router<Empty<Bytes>, E>) -> crate::Result<Self> {
+        // router.init_keep_alive_middleware();
+
+        router.init_global_options_route();
+        router.init_default_404_route();
+
+        router.init_err_handler();
+
+        router.init_regex_set()?;
+        router.init_req_info_gen();
+        Ok(Self {
+            router: Arc::from(router),
+        })
+    }
+
+    pub fn build(&self, remote_addr: SocketAddr) -> RequestService<Empty<Bytes>, E> {
         RequestService {
             router: self.router.clone(),
             remote_addr,
@@ -107,7 +131,7 @@ mod tests {
     async fn should_route_request() {
         const RESPONSE_TEXT: &str = "Hello world!";
         let remote_addr = SocketAddr::from_str("0.0.0.0:8080").unwrap();
-        let router: Router<Empty<_>, Error> = Router::builder()
+        let router: Router<Empty<Bytes>, Error> = Router::builder()
             .get("/", |_: _| async move {
                 Ok(Response::new(Full::new(hyper::body::Bytes::from(RESPONSE_TEXT))))
             })
@@ -119,7 +143,7 @@ mod tests {
             .body(Empty::<Bytes>::new())
             .unwrap();
 
-        let builder = RequestServiceBuilder::new(router).unwrap();
+        let builder = RequestServiceBuilder::<Empty<Bytes>, Error>::new(router).unwrap();
         let service = builder.build(remote_addr);
 
         poll_fn(|_| -> Poll<Result<(), RouteError>> { Poll::Ready(Ok(())) })
