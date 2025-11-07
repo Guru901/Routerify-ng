@@ -28,7 +28,7 @@ async fn logger(req: Request<Incoming>) -> Result<Request<Incoming>, Infallible>
     Ok(req)
 }
 
-fn router() -> Router<Infallible> {
+fn router() -> Router<Incoming, Infallible> {
     // Create a router and specify the logger middleware and the handlers.
     // Here, "Middleware::pre" means we're adding a pre middleware which will be executed
     // before any route handlers.

@@ -1,3 +1,4 @@
+use hyper::body::Body;
 use hyper::body::Bytes;
 use hyper::service::Service;
 use hyper_util::rt::TokioExecutor;
@@ -30,9 +31,10 @@ impl Serve {
     }
 }
 
-pub async fn serve<E>(router: Router<E>) -> Serve
+pub async fn serve<T, E>(router: Router<T, E>) -> Serve
 where
     E: Into<Box<dyn std::error::Error + Send + Sync>> + 'static,
+    T: Body + Send + 'static,
 {
     // Bind a TCP listener to an available port.
     let listener = Arc::new(TcpListener::bind("127.0.0.1:0").await.unwrap());
@@ -43,20 +45,11 @@ where
 
     let (tx, rx) = oneshot::channel::<()>();
 
-    // Spawn accept-loop handling connections.
-    let rx_fut = async move {
-        tokio::select! {
-            _ = rx => {
-                // Shutdown signal received
-            },
-        }
-    };
-
+    // Use select to allow for graceful shutdown.
     let listener2 = listener.clone();
     let router_service2 = router_service.clone();
 
     tokio::spawn(async move {
-        // Use select to allow for graceful shutdown
         tokio::select! {
             _ = async {
                 loop {
@@ -67,14 +60,17 @@ where
                         let request_service = router_service.call(&stream).await.unwrap();
                         let io = TokioIo::new(stream);
 
+                        // Make sure to use hyper::body::Incoming as request type
                         let builder = Builder::new(TokioExecutor::new());
-                        if let Err(err) = builder.serve_connection(io, request_service).await {
+                        if let Err(err) = builder.serve_connection(io, request_service) {
                             eprintln!("Error serving connection: {:?}", err);
                         }
                     });
                 }
             } => {},
-            _ = rx_fut => {},
+            _ = rx => {
+                // Shutdown signal received
+            },
         }
     });
 

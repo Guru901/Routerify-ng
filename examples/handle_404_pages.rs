@@ -30,7 +30,7 @@ async fn handler_404(_: Request<Incoming>) -> Result<Response<Full<Bytes>>, io::
         .unwrap())
 }
 
-fn router() -> Router<io::Error> {
+fn router() -> Router<Incoming, io::Error> {
     // Create a router and specify the the handlers.
     Router::builder()
         .get("/", home_handler)

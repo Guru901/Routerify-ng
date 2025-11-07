@@ -29,7 +29,7 @@ async fn error_handler(err: routerify_ng::RouteError) -> Response<Full<Bytes>> {
         .unwrap()
 }
 
-fn router() -> Router<routerify_ng::Error> {
+fn router() -> Router<Incoming, routerify_ng::Error> {
     // Create a router and specify the the handlers.
     Router::builder()
         .get("/", home_handler)

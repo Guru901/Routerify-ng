@@ -1,5 +1,6 @@
 use super::RequestContext;
 use crate::data_map::SharedDataMap;
+use hyper::body::Body;
 use hyper::{HeaderMap, Method, Request, Uri, Version};
 use std::fmt::{self, Debug, Formatter};
 use std::sync::Arc;
@@ -24,7 +25,10 @@ pub(crate) struct RequestInfoInner {
 }
 
 impl RequestInfo {
-    pub(crate) fn new_from_req(req: &Request<hyper::body::Incoming>, ctx: RequestContext) -> Self {
+    pub(crate) fn new_from_req<T>(req: &Request<T>, ctx: RequestContext) -> Self
+    where
+        T: Body,
+    {
         let inner = RequestInfoInner {
             headers: req.headers().clone(),
             method: req.method().clone(),
@@ -87,7 +91,7 @@ impl RequestInfo {
     /// use routerify_ng::{Middleware, RequestInfo, Router};
     /// use std::convert::Infallible;
     ///
-    /// fn run() -> Router<Infallible> {
+    /// fn run() -> Router<Incoming, Infallible> {
     ///     let router = Router::builder()
     ///         .middleware(Middleware::pre(|req: Request<Incoming>| async move {
     ///             req.set_context("example".to_string());

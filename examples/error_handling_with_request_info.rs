@@ -36,7 +36,7 @@ async fn error_handler(err: routerify_ng::RouteError, req_info: RequestInfo) -> 
         .unwrap()
 }
 
-fn router() -> Router<io::Error> {
+fn router() -> Router<Incoming, io::Error> {
     // Create a router and specify the the handlers.
     Router::builder()
         .get("/", home_handler)

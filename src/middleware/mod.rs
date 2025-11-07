@@ -1,7 +1,7 @@
 use crate::types::RequestInfo;
 use http_body_util::Full;
 use hyper::Response;
-use hyper::body::Bytes;
+use hyper::body::{Body, Bytes};
 use std::future::Future;
 
 pub use self::post::PostMiddleware;
@@ -19,15 +19,15 @@ mod pre;
 ///   type.
 /// * The `E` represents any error type which will be used by route handlers and the middlewares. This error type must implement the [std::error::Error](https://doc.rust-lang.org/std/error/trait.Error.html).
 #[derive(Debug)]
-pub enum Middleware<E> {
+pub enum Middleware<T, E> {
     /// Variant for the pre middleware. Refer to [Pre Middleware](./index.html#pre-middleware) for more info.
-    Pre(PreMiddleware<E>),
+    Pre(PreMiddleware<T, E>),
 
     /// Variant for the post middleware. Refer to [Post Middleware](./index.html#post-middleware) for more info.
     Post(PostMiddleware<E>),
 }
 
-impl<E: Into<Box<dyn std::error::Error + Send + Sync>> + 'static> Middleware<E> {
+impl<T: Body, E: Into<Box<dyn std::error::Error + Send + Sync>> + 'static> Middleware<T, E> {
     /// Creates a pre middleware with a handler at the `/*` path.
     ///
     /// # Examples
@@ -36,7 +36,7 @@ impl<E: Into<Box<dyn std::error::Error + Send + Sync>> + 'static> Middleware<E> 
     /// use routerify_ng::{Middleware, Router};
     /// use std::convert::Infallible;
     ///
-    /// fn run() -> Router<Infallible> {
+    /// fn run() -> Router<Incoming, Infallible> {
     ///     let router = Router::builder()
     ///         .middleware(Middleware::pre(|req| async move {
     ///             /* Do some operations */
@@ -47,10 +47,10 @@ impl<E: Into<Box<dyn std::error::Error + Send + Sync>> + 'static> Middleware<E> 
     ///     router
     /// }
     /// ```
-    pub fn pre<H, R>(handler: H) -> Middleware<E>
+    pub fn pre<H, R>(handler: H) -> Middleware<T, E>
     where
-        H: Fn(hyper::Request<hyper::body::Incoming>) -> R + Send + Sync + 'static,
-        R: Future<Output = Result<hyper::Request<hyper::body::Incoming>, E>> + Send + 'static,
+        H: Fn(hyper::Request<T>) -> R + Send + Sync + 'static,
+        R: Future<Output = Result<hyper::Request<T>, E>> + Send + 'static,
     {
         Middleware::pre_with_path("/*", handler).unwrap()
     }
@@ -63,7 +63,7 @@ impl<E: Into<Box<dyn std::error::Error + Send + Sync>> + 'static> Middleware<E> 
     /// use routerify_ng::{Middleware, Router};
     /// use std::convert::Infallible;
     ///
-    /// fn run() -> Router<Infallible> {
+    /// fn run() -> Router<Incoming, Infallible> {
     ///     let router = Router::builder()
     ///         .middleware(Middleware::post(|res| async move {
     ///             /* Do some operations */
@@ -74,7 +74,7 @@ impl<E: Into<Box<dyn std::error::Error + Send + Sync>> + 'static> Middleware<E> 
     ///     router
     /// }
     /// ```
-    pub fn post<H, R>(handler: H) -> Middleware<E>
+    pub fn post<H, R>(handler: H) -> Middleware<T, E>
     where
         H: Fn(Response<Full<Bytes>>) -> R + Send + Sync + 'static,
         R: Future<Output = Result<Response<Full<Bytes>>, E>> + Send + 'static,
@@ -104,7 +104,7 @@ impl<E: Into<Box<dyn std::error::Error + Send + Sync>> + 'static> Middleware<E> 
     ///     Ok(res)
     /// }
     ///
-    /// fn run() -> Router<Infallible> {
+    /// fn run() -> Router<Incoming, Infallible> {
     ///     let router = Router::builder()
     ///         .middleware(Middleware::post_with_info(post_middleware_with_info_handler))
     ///         .build()
@@ -112,7 +112,7 @@ impl<E: Into<Box<dyn std::error::Error + Send + Sync>> + 'static> Middleware<E> 
     ///     router
     /// }
     /// ```
-    pub fn post_with_info<H, R>(handler: H) -> Middleware<E>
+    pub fn post_with_info<H, R>(handler: H) -> Middleware<T, E>
     where
         H: Fn(Response<Full<Bytes>>, RequestInfo) -> R + Send + Sync + 'static,
         R: Future<Output = Result<Response<Full<Bytes>>, E>> + Send + 'static,
@@ -128,7 +128,7 @@ impl<E: Into<Box<dyn std::error::Error + Send + Sync>> + 'static> Middleware<E> 
     ///    use routerify_ng::{Middleware, Router};
     ///    use std::convert::Infallible;
     ///    
-    ///    fn run() -> Router<Infallible> {
+    ///    fn run() -> Router<Incoming, Infallible> {
     ///        let router = Router::builder()
     ///            .middleware(
     ///                Middleware::pre_with_path("/my-path", |req| async move {
@@ -142,11 +142,11 @@ impl<E: Into<Box<dyn std::error::Error + Send + Sync>> + 'static> Middleware<E> 
     ///        router
     ///    }
     /// ```
-    pub fn pre_with_path<P, H, R>(path: P, handler: H) -> crate::Result<Middleware<E>>
+    pub fn pre_with_path<P, H, R>(path: P, handler: H) -> crate::Result<Middleware<T, E>>
     where
         P: Into<String>,
-        H: Fn(hyper::Request<hyper::body::Incoming>) -> R + Send + Sync + 'static,
-        R: Future<Output = Result<hyper::Request<hyper::body::Incoming>, E>> + Send + 'static,
+        H: Fn(hyper::Request<T>) -> R + Send + Sync + 'static,
+        R: Future<Output = Result<hyper::Request<T>, E>> + Send + 'static,
     {
         Ok(Middleware::Pre(PreMiddleware::new(path, handler)?))
     }
@@ -159,7 +159,7 @@ impl<E: Into<Box<dyn std::error::Error + Send + Sync>> + 'static> Middleware<E> 
     /// use routerify_ng::{Middleware, Router};
     /// use std::convert::Infallible;
     ///
-    /// fn run() -> Router<Infallible> {
+    /// fn run() -> Router<Incoming, Infallible> {
     ///     let router = Router::builder()
     ///         .middleware(
     ///             Middleware::post_with_path("/my-path", |res| async move {
@@ -173,7 +173,7 @@ impl<E: Into<Box<dyn std::error::Error + Send + Sync>> + 'static> Middleware<E> 
     ///     router
     /// }
     /// ```
-    pub fn post_with_path<P, H, R>(path: P, handler: H) -> crate::Result<Middleware<E>>
+    pub fn post_with_path<P, H, R>(path: P, handler: H) -> crate::Result<Middleware<T, E>>
     where
         P: Into<String>,
         H: Fn(Response<Full<Bytes>>) -> R + Send + Sync + 'static,
@@ -204,7 +204,7 @@ impl<E: Into<Box<dyn std::error::Error + Send + Sync>> + 'static> Middleware<E> 
     ///     Ok(res)
     /// }
     ///
-    /// fn run() -> Router<Infallible> {
+    /// fn run() -> Router<Incoming, Infallible> {
     ///     let router = Router::builder()
     ///         .middleware(Middleware::post_with_info_with_path("/abc", post_middleware_with_info_handler).unwrap())
     ///         .build()
@@ -212,7 +212,7 @@ impl<E: Into<Box<dyn std::error::Error + Send + Sync>> + 'static> Middleware<E> 
     ///     router
     /// }
     /// ```
-    pub fn post_with_info_with_path<P, H, R>(path: P, handler: H) -> crate::Result<Middleware<E>>
+    pub fn post_with_info_with_path<P, H, R>(path: P, handler: H) -> crate::Result<Middleware<T, E>>
     where
         P: Into<String>,
         H: Fn(Response<Full<Bytes>>, RequestInfo) -> R + Send + Sync + 'static,

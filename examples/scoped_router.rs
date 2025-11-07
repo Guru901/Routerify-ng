@@ -35,7 +35,7 @@ mod api {
         ))))
     }
 
-    pub fn router() -> Router<io::Error> {
+    pub fn router() -> Router<Incoming, io::Error> {
         // Create a router for API and specify the the handlers.
         Router::builder()
             .get("/users/:userName/books/:bookName", user_book_handler)
@@ -44,7 +44,7 @@ mod api {
     }
 }
 
-fn router() -> Router<io::Error> {
+fn router() -> Router<Incoming, io::Error> {
     // Create a root router and specify the the handlers.
     Router::builder()
         .get("/", home_handler)

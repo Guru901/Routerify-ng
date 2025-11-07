@@ -36,7 +36,7 @@ impl RouteParams {
     /// use routerify_ng::{RouteParams, Router};
     /// use std::convert::Infallible;
     ///
-    /// fn run() -> Router<Infallible> {
+    /// fn run() -> Router<Incoming, Infallible> {
     ///     let router = Router::builder()
     ///         .get("/users/:userName/books/:bookName", |req| async move {
     ///             let params: &RouteParams = req.params();
@@ -69,7 +69,7 @@ impl RouteParams {
     /// use routerify_ng::{RouteParams, Router};
     /// use std::convert::Infallible;
     ///
-    /// fn run() -> Router<Infallible> {
+    /// fn run() -> Router<Incoming, Infallible> {
     ///     let router = Router::builder()
     ///         .get("/users/:userName", |req| async move {
     ///             let params: &RouteParams = req.params();

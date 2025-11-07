@@ -61,7 +61,7 @@ async fn error_handler(err: routerify_ng::RouteError) -> Response<Full<Bytes>> {
     }
 }
 
-fn router() -> Router<ApiError> {
+fn router() -> Router<Incoming, ApiError> {
     // Create a router and specify the the handlers.
     Router::builder()
         .get("/", home_handler)

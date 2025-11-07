@@ -86,9 +86,9 @@
 //!         .unwrap()
 //! }
 //!
-//! // Create a `Router<Infallible>` for response body type `Full<hyper::body::Bytes>`
+//! // Create a `Router<Incoming, Infallible>` for response body type `Full<hyper::body::Bytes>`
 //! // and for handler error type `Infallible`.
-//! fn router() -> Router<Infallible> {
+//! fn router() -> Router<Incoming, Infallible> {
 //!     // Create a router and specify the logger middleware and the handlers.
 //!     // Here, "Middleware::pre" means we're adding a pre middleware which will be executed
 //!     // before any route handlers.
@@ -161,7 +161,7 @@
 //!     Ok(Response::new(Full::new(Bytes::from("About page"))))
 //! }
 //!
-//! # fn run() -> Router<Infallible> {
+//! # fn run() -> Router<Incoming, Infallible> {
 //! let router = Router::builder().get("/about", about_handler).build().unwrap();
 //! # router
 //! # }
@@ -176,7 +176,7 @@
 //! use routerify_ng::Router;
 //! # use std::convert::Infallible;
 //!
-//! # fn run() -> Router<Infallible> {
+//! # fn run() -> Router<Incoming, Infallible> {
 //! let router = Router::builder()
 //!     .get("/about", |req| async move {
 //!         Ok(Response::new(Full::new(Bytes::from("About page"))))
@@ -204,7 +204,7 @@
 //! use routerify_ng::Router;
 //! # use std::convert::Infallible;
 //!
-//! # fn run() -> Router<Infallible> {
+//! # fn run() -> Router<Incoming, Infallible> {
 //! let router = Router::builder()
 //!     .get("/about", |req| async move {
 //!         Ok(Response::new(Full::new(Bytes::from("About page"))))
@@ -224,7 +224,7 @@
 //! use routerify_ng::Router;
 //! # use std::convert::Infallible;
 //!
-//! # fn run() -> Router<Infallible> {
+//! # fn run() -> Router<Incoming, Infallible> {
 //! let router = Router::builder()
 //!     .get("/users/*", |req| async move {
 //!         Ok(Response::new(Full::new(Bytes::from(
@@ -248,7 +248,7 @@
 //! use routerify_ng::Router;
 //! # use std::convert::Infallible;
 //!
-//! # fn run() -> Router<Infallible> {
+//! # fn run() -> Router<Incoming, Infallible> {
 //! let router = Router::builder()
 //!     .get(
 //!         "/users",
@@ -289,7 +289,7 @@
 //! use routerify_ng::prelude::*;
 //! # use std::convert::Infallible;
 //!
-//! # fn run() -> Router<Infallible> {
+//! # fn run() -> Router<Incoming, Infallible> {
 //! let router = Router::builder()
 //!     .get("/users/:userName/books/:bookName", |req| async move {
 //!         let user_name = req.param("userName").unwrap();
@@ -321,7 +321,7 @@
 //! use routerify_ng::Router;
 //! use std::convert::Infallible;
 //!
-//! fn api_router() -> Router<Infallible> {
+//! fn api_router() -> Router<Incoming, Infallible> {
 //!     Router::builder()
 //!         .get("/books", |req| async move {
 //!             Ok(Response::new(Full::new(Bytes::from("List of books"))))
@@ -336,7 +336,7 @@
 //!         .unwrap()
 //! }
 //!
-//! # fn run() -> Router<Infallible> {
+//! # fn run() -> Router<Incoming, Infallible> {
 //! let router = Router::builder()
 //!     // Mounts the API router at "/api" path .
 //!     .scope("/api", api_router())
@@ -384,7 +384,7 @@
 //!     Ok(transformed_req)
 //! }
 //!
-//! # fn run() -> Router<Infallible> {
+//! # fn run() -> Router<Incoming, Infallible> {
 //! let router = Router::builder()
 //!     // Create a pre middleware instance by `Middleware::pre` method
 //!     // and attach it.
@@ -412,7 +412,7 @@
 //!     Ok(req)
 //! }
 //!
-//! # fn run() -> Router<Infallible> {
+//! # fn run() -> Router<Incoming, Infallible> {
 //! let router = Router::builder()
 //!     .middleware(Middleware::pre(logger_middleware_handler))
 //!     .build()
@@ -445,7 +445,7 @@
 //!     Ok(transformed_res)
 //! }
 //!
-//! # fn run() -> Router<Infallible> {
+//! # fn run() -> Router<Incoming, Infallible> {
 //! let router = Router::builder()
 //!     // Create a post middleware instance by `Middleware::post` method
 //!     // and attach it.
@@ -476,7 +476,7 @@
 //!     Ok(res)
 //! }
 //!
-//! # fn run() -> Router<Infallible> {
+//! # fn run() -> Router<Incoming, Infallible> {
 //! let router = Router::builder()
 //!     .middleware(Middleware::post(my_post_middleware_handler))
 //!     .build()
@@ -512,7 +512,7 @@
 //!     Ok(transformed_res)
 //! }
 //!
-//! # fn run() -> Router<Infallible> {
+//! # fn run() -> Router<Incoming, Infallible> {
 //! let router = Router::builder()
 //!     // Create a post middleware instance by `Middleware::post_with_info` method
 //!     // and attach it.
@@ -587,9 +587,9 @@
 //!         .unwrap()
 //! }
 //!
-//! // Create a `Router<Infallible>` for response body type `hyper::Body`
+//! // Create a `Router<Incoming, Infallible>` for response body type `hyper::Body`
 //! // and for handler error type `Infallible`.
-//! fn router() -> Router<Infallible> {
+//! fn router() -> Router<Incoming, Infallible> {
 //!     Router::builder()
 //!         // Specify the state data which will be available to every route handlers,
 //!         // error handler and middlewares.
@@ -614,7 +614,7 @@
 //!     # use std::{convert::Infallible, net::SocketAddr};
 //!     # use routerify_ng::{Middleware, Router, RouterService, RequestInfo};
 //!     # use hyper::{Request, Response, StatusCode};
-//!     pub fn router() -> Router<Infallible> {
+//!     pub fn router() -> Router<Incoming, Infallible> {
 //!         Router::builder()
 //!             // Specify data for this sub-router only.
 //!             .data("Data for foo router")
@@ -627,7 +627,7 @@
 //!     # use std::{convert::Infallible, net::SocketAddr};
 //!     # use routerify_ng::{Middleware, Router, RouterService, RequestInfo};
 //!     # use hyper::{Request, Response, StatusCode};
-//!     pub fn router() -> Router<Infallible> {
+//!     pub fn router() -> Router<Incoming, Infallible> {
 //!         Router::builder()
 //!             // Specify data for this sub-router only.
 //!             .data("Data for bar router")
@@ -636,7 +636,7 @@
 //!     }
 //! }
 //!
-//! fn router() -> Router<Infallible> {
+//! fn router() -> Router<Incoming, Infallible> {
 //!     Router::builder()
 //!         // This data will be available to all the child sub-routers.
 //!         .data(100_u32)
@@ -656,7 +656,7 @@
 //! # use routerify_ng::{Middleware, Router, RouterService, RequestInfo};
 //! # use std::{convert::Infallible, net::SocketAddr};
 //! # use std::sync::Mutex;
-//! fn router() -> Router<Infallible> {
+//! fn router() -> Router<Incoming, Infallible> {
 //!     Router::builder()
 //!         // Share multiple data, a single data for each data type.
 //!         .data(100_u32)

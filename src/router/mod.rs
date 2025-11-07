@@ -6,6 +6,7 @@ use crate::middleware::{PostMiddleware, PreMiddleware};
 use crate::route::Route;
 use crate::types::RequestInfo;
 use http_body_util::Full;
+use hyper::body::Body;
 use hyper::body::Bytes;
 use hyper::{Method, Request, Response, StatusCode, header};
 use regex::RegexSet;
@@ -59,9 +60,9 @@ pub(crate) type ErrHandlerWithInfoReturn = Box<dyn Future<Output = Response<Full
 ///     router
 /// }
 /// ```
-pub struct Router<E> {
-    pub(crate) pre_middlewares: Vec<PreMiddleware<E>>,
-    pub(crate) routes: Vec<Route<E>>,
+pub struct Router<T, E> {
+    pub(crate) pre_middlewares: Vec<PreMiddleware<T, E>>,
+    pub(crate) routes: Vec<Route<T, E>>,
     pub(crate) post_middlewares: Vec<PostMiddleware<E>>,
     pub(crate) scoped_data_maps: Vec<ScopedDataMap>,
 
@@ -92,10 +93,10 @@ impl ErrHandler {
     }
 }
 
-impl<E: Into<Box<dyn std::error::Error + Send + Sync>> + 'static> Router<E> {
+impl<T: Body + 'static, E: Into<Box<dyn std::error::Error + Send + Sync>> + 'static> Router<T, E> {
     pub(crate) fn new(
-        pre_middlewares: Vec<PreMiddleware<E>>,
-        routes: Vec<Route<E>>,
+        pre_middlewares: Vec<PreMiddleware<T, E>>,
+        routes: Vec<Route<T, E>>,
         post_middlewares: Vec<PostMiddleware<E>>,
         scoped_data_maps: Vec<ScopedDataMap>,
         err_handler: Option<ErrHandler>,
@@ -165,7 +166,7 @@ impl<E: Into<Box<dyn std::error::Error + Send + Sync>> + 'static> Router<E> {
         }
 
         if let Some(router) = self.downcast_to_hyper_body_type() {
-            let options_route: Route<E> = Route::new("/*", options_method, |_req| async move {
+            let options_route: Route<T, E> = Route::new("/*", options_method, |_req| async move {
                 Ok(Response::builder()
                     .status(StatusCode::NO_CONTENT)
                     .body(Full::new(Bytes::new()))
@@ -193,7 +194,7 @@ impl<E: Into<Box<dyn std::error::Error + Send + Sync>> + 'static> Router<E> {
         }
 
         if let Some(router) = self.downcast_to_hyper_body_type() {
-            let default_404_route: Route<E> =
+            let default_404_route: Route<T, E> =
                 Route::new("/*", constants::ALL_POSSIBLE_HTTP_METHODS.to_vec(), |_req| async move {
                     Ok(Response::builder()
                         .status(StatusCode::NOT_FOUND)
@@ -237,20 +238,20 @@ impl<E: Into<Box<dyn std::error::Error + Send + Sync>> + 'static> Router<E> {
         }
     }
 
-    fn downcast_to_hyper_body_type(&mut self) -> Option<&mut Router<E>> {
+    fn downcast_to_hyper_body_type(&mut self) -> Option<&mut Router<T, E>> {
         let any_obj: &mut dyn Any = self;
-        any_obj.downcast_mut::<Router<E>>()
+        any_obj.downcast_mut::<Router<T, E>>()
     }
 
     /// Return a [RouterBuilder](./struct.RouterBuilder.html) instance to build a `Router`.
-    pub fn builder() -> RouterBuilder<E> {
+    pub fn builder() -> RouterBuilder<T, E> {
         builder::RouterBuilder::new()
     }
 
     pub(crate) async fn process(
         &self,
         target_path: &str,
-        mut req: Request<hyper::body::Incoming>,
+        mut req: Request<T>,
         mut req_info: Option<RequestInfo>,
     ) -> crate::Result<Response<Full<Bytes>>> {
         let (
@@ -353,11 +354,11 @@ impl<E: Into<Box<dyn std::error::Error + Send + Sync>> + 'static> Router<E> {
 
     async fn execute_pre_middleware(
         &self,
-        req: Request<hyper::body::Incoming>,
+        req: Request<T>,
         matched_pre_middleware_idxs: Vec<usize>,
         route_scope_depth: Option<u32>,
         req_info: Option<RequestInfo>,
-    ) -> crate::Result<Result<Request<hyper::body::Incoming>, Response<Full<Bytes>>>> {
+    ) -> crate::Result<Result<Request<T>, Response<Full<Bytes>>>> {
         let mut transformed_req = req;
         for idx in matched_pre_middleware_idxs {
             let pre_middleware = &self.pre_middlewares[idx];
@@ -423,7 +424,7 @@ impl<E: Into<Box<dyn std::error::Error + Send + Sync>> + 'static> Router<E> {
     }
 }
 
-impl<E> Debug for Router<E> {
+impl<T, E> Debug for Router<T, E> {
     fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
         write!(
             f,

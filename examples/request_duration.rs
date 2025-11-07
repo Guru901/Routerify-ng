@@ -30,7 +30,7 @@ async fn after(res: Response<Full<Bytes>>, req_info: RequestInfo) -> Result<Resp
     Ok(res)
 }
 
-fn router() -> Router<Infallible> {
+fn router() -> Router<Incoming, Infallible> {
     Router::builder()
         .get("/", hello)
         .middleware(Middleware::pre(before))
