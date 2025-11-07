@@ -15,13 +15,14 @@ pub trait RequestExt {
     /// use routerify_ng::ext::RequestExt;
     /// use routerify_ng::{RouteParams, Router};
     /// use std::convert::Infallible;
+    /// use hyper::body::Incoming;
     ///
-    /// fn run() -> Router<Incoming, Infallible> {
+    /// fn run() -> Router<Incoming, hyper::Error> {
     ///     let router = Router::builder()
     ///         .get("/users/:userName/books/:bookName", |req| async move {
     ///             let params: &RouteParams = req.params();
     ///             let user_name = params.get("userName").unwrap();
-    ///             let book_name  params.get("bookName").unwrap();
+    ///             let book_name = params.get("bookName").unwrap();
     ///
     ///             Ok(Response::new(Full::new(Bytes::from(format!(
     ///                 "Username: {}, Book Name: {}",
@@ -46,6 +47,7 @@ pub trait RequestExt {
     /// use routerify_ng::ext::RequestExt;
     /// use routerify_ng::Router;
     /// use std::convert::Infallible;
+    /// use hyper::body::Incoming;
     ///
     /// fn run() -> Router<Incoming, Infallible> {
     ///     let router = Router::builder()
@@ -69,11 +71,13 @@ pub trait RequestExt {
     ///
     /// # Examples
     ///
-    /// ```use http_body_util::Full;
+    /// ```
+    /// use http_body_util::Full;
     /// use hyper::{body::Bytes, Response};
     /// use routerify_ng::ext::RequestExt;
     /// use routerify_ng::Router;
     /// use std::convert::Infallible;
+    /// use hyper::body::Incoming;
     ///
     /// fn run() -> Router<Incoming, Infallible> {
     ///     let router = Router::builder()

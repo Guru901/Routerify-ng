@@ -35,6 +35,7 @@ impl RouteParams {
     /// use routerify_ng::ext::RequestExt;
     /// use routerify_ng::{RouteParams, Router};
     /// use std::convert::Infallible;
+    /// use hyper::body::Incoming;
     ///
     /// fn run() -> Router<Incoming, Infallible> {
     ///     let router = Router::builder()
@@ -68,6 +69,7 @@ impl RouteParams {
     /// use routerify_ng::ext::RequestExt;
     /// use routerify_ng::{RouteParams, Router};
     /// use std::convert::Infallible;
+    /// use hyper::body::Incoming;
     ///
     /// fn run() -> Router<Incoming, Infallible> {
     ///     let router = Router::builder()

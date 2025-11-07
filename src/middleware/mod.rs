@@ -35,6 +35,7 @@ impl<T: Body, E: Into<Box<dyn std::error::Error + Send + Sync>> + 'static> Middl
     /// ```
     /// use routerify_ng::{Middleware, Router};
     /// use std::convert::Infallible;
+    /// use hyper::body::Incoming;
     ///
     /// fn run() -> Router<Incoming, Infallible> {
     ///     let router = Router::builder()
@@ -62,6 +63,7 @@ impl<T: Body, E: Into<Box<dyn std::error::Error + Send + Sync>> + 'static> Middl
     /// ```
     /// use routerify_ng::{Middleware, Router};
     /// use std::convert::Infallible;
+    /// use hyper::body::Incoming;
     ///
     /// fn run() -> Router<Incoming, Infallible> {
     ///     let router = Router::builder()
@@ -92,6 +94,7 @@ impl<T: Body, E: Into<Box<dyn std::error::Error + Send + Sync>> + 'static> Middl
     /// use hyper::{body::Bytes, Response};
     /// use routerify_ng::{Middleware, RequestInfo, Router};
     /// use std::convert::Infallible;
+    /// use hyper::body::Incoming;
     ///
     /// async fn post_middleware_with_info_handler(
     ///     res: Response<Full<Bytes>>,
@@ -125,22 +128,23 @@ impl<T: Body, E: Into<Box<dyn std::error::Error + Send + Sync>> + 'static> Middl
     /// # Examples
     ///
     /// ```
-    ///    use routerify_ng::{Middleware, Router};
-    ///    use std::convert::Infallible;
-    ///    
-    ///    fn run() -> Router<Incoming, Infallible> {
-    ///        let router = Router::builder()
-    ///            .middleware(
-    ///                Middleware::pre_with_path("/my-path", |req| async move {
-    ///                    /* Do some operations */
-    ///                    Ok(req)
-    ///                })
-    ///                .unwrap(),
-    ///            )
-    ///            .build()
-    ///            .unwrap();
-    ///        router
-    ///    }
+    /// use routerify_ng::{Middleware, Router};
+    /// use std::convert::Infallible;
+    /// use hyper::body::Incoming;
+    ///
+    /// fn run() -> Router<Incoming, Infallible> {
+    ///     let router = Router::builder()
+    ///         .middleware(
+    ///             Middleware::pre_with_path("/my-path", |req| async move {
+    ///                 /* Do some operations */
+    ///                 Ok(req)
+    ///             })
+    ///             .unwrap(),
+    ///         )
+    ///         .build()
+    ///         .unwrap();
+    ///     router
+    /// }
     /// ```
     pub fn pre_with_path<P, H, R>(path: P, handler: H) -> crate::Result<Middleware<T, E>>
     where
@@ -158,6 +162,7 @@ impl<T: Body, E: Into<Box<dyn std::error::Error + Send + Sync>> + 'static> Middl
     /// ```
     /// use routerify_ng::{Middleware, Router};
     /// use std::convert::Infallible;
+    /// use hyper::body::Incoming;
     ///
     /// fn run() -> Router<Incoming, Infallible> {
     ///     let router = Router::builder()
@@ -192,6 +197,7 @@ impl<T: Body, E: Into<Box<dyn std::error::Error + Send + Sync>> + 'static> Middl
     /// use routerify_ng::{Middleware, RequestInfo, Router};
     /// use std::convert::Infallible;
     /// use hyper::{Response, body::Bytes};
+    /// use hyper::body::Incoming;
     ///
     /// async fn post_middleware_with_info_handler(
     ///     res: Response<Full<Bytes>>,

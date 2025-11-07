@@ -40,7 +40,7 @@ type HandlerReturn<E> = Box<dyn Future<Output = Result<Response<Full<Bytes>>, E>
 ///     Ok(Response::new(Full::new(Bytes::from("home"))))
 /// }
 ///
-/// fn run() -> Router<hyper::Error> {
+/// fn run() -> Router<Incoming, hyper::Error> {
 ///     let router = Router::builder().get("/", home_handler).build().unwrap();
 ///     router
 /// }

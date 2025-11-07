@@ -55,6 +55,8 @@ impl<T: Body, E: Into<Box<dyn std::error::Error + Send + Sync>> + 'static> PreMi
     /// ```
     /// use routerify_ng::{Middleware, PreMiddleware, Router};
     /// use std::convert::Infallible;
+    /// use hyper::body::Incoming;
+    ///
     /// fn run() -> Router<Incoming, Infallible> {
     ///     let router = Router::builder()
     ///         .middleware(Middleware::Pre(

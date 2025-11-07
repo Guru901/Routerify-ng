@@ -68,6 +68,7 @@ impl<E: Into<Box<dyn std::error::Error + Send + Sync>> + 'static> PostMiddleware
     /// ```
     /// use routerify_ng::{Middleware, PostMiddleware, Router};
     /// use std::convert::Infallible;
+    /// use hyper::body::Incoming;
     ///
     /// fn run() -> Router<Incoming, Infallible> {
     ///     let router = Router::builder()

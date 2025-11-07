@@ -55,8 +55,8 @@ pub(crate) type ErrHandlerWithInfoReturn = Box<dyn Future<Output = Response<Full
 ///     Ok(Response::new(Full::new(Bytes::from("About page"))))
 /// }
 ///
-/// fn run() -> Router<hyper::Error> {
-///     let router: Router<hyper::Error> = Router::builder().get("/about", about_handler).build().unwrap();
+/// fn run() -> Router<Incoming, hyper::Error> {
+///     let router: Router<Incoming, hyper::Error> = Router::builder().get("/about", about_handler).build().unwrap();
 ///     router
 /// }
 /// ```

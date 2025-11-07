@@ -43,10 +43,10 @@ use std::sync::Arc;
 ///     Ok(req)
 /// }
 ///
-/// fn run() -> Router<hyper::Error> {
+/// fn run() -> Router<Incoming, hyper::Error> {
 ///     // Use Router::builder() method to create a new RouterBuilder instance.
 ///     // We will use hyper::Body as response body type and hyper::Error as error type.
-///     let router: Router<hyper::Error> = Router::builder()
+///     let router: Router<Incoming, hyper::Error> = Router::builder()
 ///         .get("/", home_handler)
 ///         .post("/upload", upload_handler)
 ///         .middleware(Middleware::pre(some_pre_middleware_handler))
@@ -124,7 +124,7 @@ impl<T: Body + 'static, E: Into<Box<dyn std::error::Error + Send + Sync>> + 'sta
     ///     Ok(Response::new(Full::new(Bytes::from("home"))))
     /// }
     ///
-    /// fn run() -> Router<hyper::Error> {
+    /// fn run() -> Router<Incoming, hyper::Error> {
     ///     let router = Router::builder().get("/", home_handler).build().unwrap();
     ///     router
     /// }
@@ -152,7 +152,7 @@ impl<T: Body + 'static, E: Into<Box<dyn std::error::Error + Send + Sync>> + 'sta
     /// async fn home_handler(req: Request<Incoming>) -> Result<Response<Full<Bytes>>, hyper::Error> {
     ///     Ok(Response::new(Full::new(Bytes::from("home"))))
     /// }
-    /// fn run() -> Router<hyper::Error> {
+    /// fn run() -> Router<Incoming, hyper::Error> {
     ///     let router = Router::builder().get_or_head("/", home_handler).build().unwrap();
     ///     router
     /// }
@@ -180,7 +180,7 @@ impl<T: Body + 'static, E: Into<Box<dyn std::error::Error + Send + Sync>> + 'sta
     /// async fn file_upload_handler(req: Request<Incoming>) -> Result<Response<Full<Bytes>>, hyper::Error> {
     ///     Ok(Response::new(Full::new(Bytes::from("File uploader"))))
     /// }
-    /// fn run() -> Router<hyper::Error> {
+    /// fn run() -> Router<Incoming, hyper::Error> {
     ///     let router = Router::builder().post("/upload", file_upload_handler).build().unwrap();
     ///     router
     /// }
@@ -208,7 +208,7 @@ impl<T: Body + 'static, E: Into<Box<dyn std::error::Error + Send + Sync>> + 'sta
     /// async fn file_upload_handler(req: Request<Incoming>) -> Result<Response<Full<Bytes>>, hyper::Error> {
     ///     Ok(Response::new(Full::new(Bytes::from("File uploader"))))
     /// }
-    /// fn run() -> Router<hyper::Error> {
+    /// fn run() -> Router<Incoming, hyper::Error> {
     ///     let router = Router::builder().put("/upload", file_upload_handler).build().unwrap();
     ///     router
     /// }
@@ -227,24 +227,24 @@ impl<T: Body + 'static, E: Into<Box<dyn std::error::Error + Send + Sync>> + 'sta
     /// # Examples
     ///
     /// ```
-    ///  use http_body_util::Full;
-    ///  use hyper::{
-    ///      body::{Bytes, Incoming},
-    ///      Request, Response,
-    ///  };
-    ///  use routerify_ng::Router;
+    /// use http_body_util::Full;
+    /// use hyper::{
+    ///     body::{Bytes, Incoming},
+    ///     Request, Response,
+    /// };
+    /// use routerify_ng::Router;
     ///  
-    ///  async fn delete_file_handler(req: Request<Incoming>) -> Result<Response<Full<Bytes>>, hyper::Error> {
-    ///      Ok(Response::new(Full::new(Bytes::from("Delete file"))))
-    ///  }
-    ///  
-    ///  fn run() -> Router<hyper::Error> {
+    /// async fn delete_file_handler(req: Request<Incoming>) -> Result<Response<Full<Bytes>>, hyper::Error> {
+    ///     Ok(Response::new(Full::new(Bytes::from("Delete file"))))
+    /// }
+    ///
+    /// fn run() -> Router<Incoming, hyper::Error> {
     ///      let router = Router::builder()
-    ///          .delete("/delete-file", delete_file_handler)
-    ///          .build()
-    ///          .unwrap();
-    ///      router
-    ///  }
+    ///         .delete("/delete-file", delete_file_handler)
+    ///         .build()
+    ///         .unwrap();
+    ///     router
+    /// }
     /// ```
     pub fn delete<P, H, R>(self, path: P, handler: H) -> Self
     where
@@ -269,7 +269,7 @@ impl<T: Body + 'static, E: Into<Box<dyn std::error::Error + Send + Sync>> + 'sta
     /// async fn a_head_handler(req: Request<Incoming>) -> Result<Response<Full<Bytes>>, hyper::Error> {
     ///     Ok(Response::new(Full::new(Bytes::new())))
     /// }
-    /// fn run() -> Router<hyper::Error> {
+    /// fn run() -> Router<Incoming, hyper::Error> {
     ///     let router = Router::builder().head("/fetch-data", a_head_handler).build().unwrap();
     ///     router
     /// }
@@ -299,7 +299,7 @@ impl<T: Body + 'static, E: Into<Box<dyn std::error::Error + Send + Sync>> + 'sta
     ///     Ok(Response::new(Full::new(Bytes::new())))
     /// }
     ///
-    /// fn run() -> Router<hyper::Error> {
+    /// fn run() -> Router<Incoming, hyper::Error> {
     ///     let router = Router::builder().trace("/abc", trace_handler).build().unwrap();
     ///     router
     /// }
@@ -329,7 +329,7 @@ impl<T: Body + 'static, E: Into<Box<dyn std::error::Error + Send + Sync>> + 'sta
     ///     Ok(Response::new(Full::new(Bytes::new())))
     /// }
     ///
-    /// fn run() -> Router<hyper::Error> {
+    /// fn run() -> Router<Incoming, hyper::Error> {
     ///     let router = Router::builder().connect("/abc", connect_handler).build().unwrap();
     ///     router
     /// }
@@ -359,7 +359,7 @@ impl<T: Body + 'static, E: Into<Box<dyn std::error::Error + Send + Sync>> + 'sta
     ///     Ok(Response::new((Full::new(Bytes::from("Data updater")))))
     /// }
     ///
-    /// fn run() -> Router<hyper::Error> {
+    /// fn run() -> Router<Incoming, hyper::Error> {
     ///     let router = Router::builder()
     ///         .patch("/update-data", update_data_handler)
     ///         .build()
@@ -392,7 +392,7 @@ impl<T: Body + 'static, E: Into<Box<dyn std::error::Error + Send + Sync>> + 'sta
     ///     Ok(Response::new(Full::new(Bytes::new())))
     /// }
     ///
-    /// fn run() -> Router<hyper::Error> {
+    /// fn run() -> Router<Incoming, hyper::Error> {
     ///     let router = Router::builder().options("/abc", options_handler).build().unwrap();
     ///     router
     /// }
@@ -430,7 +430,7 @@ impl<T: Body + 'static, E: Into<Box<dyn std::error::Error + Send + Sync>> + 'sta
     ///         .unwrap())
     /// }
     ///
-    /// fn run() -> Router<hyper::Error> {
+    /// fn run() -> Router<Incoming, hyper::Error> {
     ///     let router = Router::builder()
     ///         .get("/home", home_handler)
     ///         .any(handler_404)
@@ -463,7 +463,7 @@ impl<T: Body + 'static, E: Into<Box<dyn std::error::Error + Send + Sync>> + 'sta
     ///     Ok(Response::new(Full::new(Bytes::from("home"))))
     /// }
     ///
-    /// fn run() -> Router<hyper::Error> {
+    /// fn run() -> Router<Incoming, hyper::Error> {
     ///     let router = Router::builder()
     ///         // It will accept requests at any method type at the specified path.
     ///         .any_method("/", home_handler)
@@ -499,7 +499,7 @@ impl<T: Body + 'static, E: Into<Box<dyn std::error::Error + Send + Sync>> + 'sta
     ///     ))))
     /// }
     ///
-    /// fn run() -> Router<hyper::Error> {
+    /// fn run() -> Router<Incoming, hyper::Error> {
     ///     let router = Router::builder()
     ///         .add("/checkout", vec![Method::GET, Method::POST], cart_checkout_handler)
     ///         .build()
@@ -533,12 +533,17 @@ impl<T: Body + 'static, E: Into<Box<dyn std::error::Error + Send + Sync>> + 'sta
     ///
     /// ```
     /// use routerify_ng::Router;
+    /// use hyper::body::Incoming;
+    /// use std::convert::Infallible;
+    ///
     /// mod api {
     ///     use http_body_util::Full;
     ///     use hyper::{body::Bytes, Response};
     ///     use routerify_ng::Router;
+    ///     use hyper::body::Incoming;
+    ///     use std::convert::Infallible;
     ///
-    ///     pub fn router() -> Router<hyper::Error> {
+    ///     pub fn router() -> Router<Incoming, Infallible> {
     ///         Router::builder()
     ///             .get("/users", |_| async move {
     ///                 Ok(Response::new(Full::new(Bytes::from("User list"))))
@@ -551,9 +556,8 @@ impl<T: Body + 'static, E: Into<Box<dyn std::error::Error + Send + Sync>> + 'sta
     ///     }
     /// }
     ///
-    /// fn run() -> Router<hyper::Error> {
-    ///     let router = Router::builder()
-    ///         // Now, mount the api router at `/api` path.
+    /// fn run() -> Router<Incoming, Infallible> {
+    ///     let router: Router<Incoming, Infallible> = Router::builder()
     ///         .scope("/api", api::router())
     ///         .build()
     ///         .unwrap();
@@ -655,6 +659,7 @@ impl<T: Body + 'static, E: Into<Box<dyn std::error::Error + Send + Sync>> + 'sta
     /// use hyper::{Request, Response};
     /// use routerify_ng::{Middleware, Router};
     /// use std::convert::Infallible;
+    /// use hyper::body::Incoming;
     ///
     /// fn run() -> Router<Incoming, Infallible> {
     ///     let router = Router::builder()

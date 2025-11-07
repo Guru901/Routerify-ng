@@ -175,6 +175,7 @@
 //! use hyper::{body::Bytes, Response};
 //! use routerify_ng::Router;
 //! # use std::convert::Infallible;
+//! use hyper::body::Incoming;
 //!
 //! # fn run() -> Router<Incoming, Infallible> {
 //! let router = Router::builder()
@@ -203,6 +204,7 @@
 //! use hyper::{body::Bytes, Response};
 //! use routerify_ng::Router;
 //! # use std::convert::Infallible;
+//! use hyper::body::Incoming;
 //!
 //! # fn run() -> Router<Incoming, Infallible> {
 //! let router = Router::builder()
@@ -223,6 +225,7 @@
 //! use hyper::{body::Bytes, Response};
 //! use routerify_ng::Router;
 //! # use std::convert::Infallible;
+//! use hyper::body::Incoming;
 //!
 //! # fn run() -> Router<Incoming, Infallible> {
 //! let router = Router::builder()
@@ -247,6 +250,7 @@
 //! use hyper::{body::Bytes, Response, StatusCode};
 //! use routerify_ng::Router;
 //! # use std::convert::Infallible;
+//! use hyper::body::Incoming;
 //!
 //! # fn run() -> Router<Incoming, Infallible> {
 //! let router = Router::builder()
@@ -288,6 +292,7 @@
 //! use hyper::{body::Bytes, Response};
 //! use routerify_ng::prelude::*;
 //! # use std::convert::Infallible;
+//! use hyper::body::Incoming;
 //!
 //! # fn run() -> Router<Incoming, Infallible> {
 //! let router = Router::builder()
@@ -320,6 +325,7 @@
 //! use routerify_ng::prelude::*;
 //! use routerify_ng::Router;
 //! use std::convert::Infallible;
+//! use hyper::body::Incoming;
 //!
 //! fn api_router() -> Router<Incoming, Infallible> {
 //!     Router::builder()
@@ -434,6 +440,7 @@
 //! use hyper::{body::Bytes, Response};
 //! use routerify_ng::{Middleware, Router};
 //! use std::convert::Infallible;
+//! use hyper::body::Incoming;
 //!
 //! // The handler for a post middleware.
 //! // It accepts a `res` and it transforms the `res` and passes it to the next middlewares.
@@ -468,6 +475,7 @@
 //! use std::convert::Infallible;
 //! use http_body_util::Full;
 //! use hyper::body::Bytes;
+//! use hyper::body::Incoming;
 //!
 //! async fn my_post_middleware_handler(mut res: Response<Full<Bytes>>) -> Result<Response<Full<Bytes>>, Infallible> {
 //!     // Add a header to response object.
@@ -496,6 +504,7 @@
 //! use hyper::{body::Bytes, Response};
 //! use routerify_ng::{Middleware, RequestInfo, Router};
 //! use std::convert::Infallible;
+//! use hyper::body::Incoming;
 //!
 //! // The handler for a post middleware which requires request info.
 //! // It accepts `res` and `req_info` and it transforms the `res` and passes it to the next middlewares.
@@ -609,11 +618,14 @@
 //! # use routerify_ng::prelude::*;
 //! # use routerify_ng::{Middleware, Router, RouterService, RequestInfo};
 //! # use std::{convert::Infallible, net::SocketAddr};
+//! # use hyper::body::Incoming;
 //!
 //! mod foo {
 //!     # use std::{convert::Infallible, net::SocketAddr};
 //!     # use routerify_ng::{Middleware, Router, RouterService, RequestInfo};
 //!     # use hyper::{Request, Response, StatusCode};
+//!     use hyper::body::Incoming;
+//!
 //!     pub fn router() -> Router<Incoming, Infallible> {
 //!         Router::builder()
 //!             // Specify data for this sub-router only.
@@ -627,6 +639,8 @@
 //!     # use std::{convert::Infallible, net::SocketAddr};
 //!     # use routerify_ng::{Middleware, Router, RouterService, RequestInfo};
 //!     # use hyper::{Request, Response, StatusCode};
+//!     use hyper::body::Incoming;
+//!
 //!     pub fn router() -> Router<Incoming, Infallible> {
 //!         Router::builder()
 //!             // Specify data for this sub-router only.
@@ -655,6 +669,7 @@
 //! # use routerify_ng::prelude::*;
 //! # use routerify_ng::{Middleware, Router, RouterService, RequestInfo};
 //! # use std::{convert::Infallible, net::SocketAddr};
+//! # use hyper::body::Incoming;
 //! # use std::sync::Mutex;
 //! fn router() -> Router<Incoming, Infallible> {
 //!     Router::builder()
@@ -689,7 +704,7 @@
 //! ```
 //! use routerify_ng::{Router, Middleware};
 //! use routerify_ng::prelude::*;
-//! use hyper::{Response, StatusCode, body::Bytes};
+//! use hyper::{Response, StatusCode, body::{Bytes, Incoming}};
 //! use http_body_util::Full;
 //!
 //! // The error handler will accept the thrown error in routerify_ng::Error type and
@@ -701,7 +716,7 @@
 //!       .unwrap()
 //! }
 //!
-//! # fn run() -> Router<hyper::Error> {
+//! # fn run() -> Router<Incoming, hyper::Error> {
 //! let router = Router::builder()
 //!      .get("/users", |req| async move { Ok(Response::new(Full::new(Bytes::from("It might raise an error")))) })
 //!      // Here attach the custom error handler defined above.
@@ -721,7 +736,7 @@
 //! ```
 //! use routerify_ng::{Router, Middleware, RequestInfo};
 //! use routerify_ng::prelude::*;
-//! use hyper::{Response, StatusCode, body::Bytes};
+//! use hyper::{Response, StatusCode, body::{Bytes, Incoming}};
 //! use http_body_util::Full;
 //!
 //! // The error handler will accept the thrown error and the request info and
@@ -734,7 +749,7 @@
 //!       .unwrap()
 //! }
 //!
-//! # fn run() -> Router<hyper::Error> {
+//! # fn run() -> Router<Incoming, hyper::Error> {
 //! let router = Router::builder()
 //!      .get("/users", |req| async move { Ok(Response::new(Full::new(Bytes::from("It might raise an error")))) })
 //!      // Now register this error handler.
