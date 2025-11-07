@@ -2,11 +2,9 @@ use crate::Error;
 use crate::helpers;
 use crate::router::Router;
 use crate::types::{RequestContext, RequestInfo, RequestMeta};
-use http_body_util::Empty;
 use http_body_util::Full;
 use hyper::body::Body;
 use hyper::body::Bytes;
-use hyper::body::Incoming;
 use hyper::{Request, Response, service::Service};
 use std::future::Future;
 use std::net::SocketAddr;
@@ -67,8 +65,10 @@ pub struct RequestServiceBuilder<T, E> {
     router: Arc<Router<T, E>>,
 }
 
-impl<E: Into<Box<dyn std::error::Error + Send + Sync>> + 'static> RequestServiceBuilder<Incoming, E> {
-    pub fn new(mut router: Router<Incoming, E>) -> crate::Result<Self> {
+impl<T: Body + Send + 'static, E: Into<Box<dyn std::error::Error + Send + Sync>> + 'static>
+    RequestServiceBuilder<T, E>
+{
+    pub fn new(mut router: Router<T, E>) -> crate::Result<Self> {
         // router.init_keep_alive_middleware();
 
         router.init_global_options_route();
@@ -83,31 +83,7 @@ impl<E: Into<Box<dyn std::error::Error + Send + Sync>> + 'static> RequestService
         })
     }
 
-    pub fn build(&self, remote_addr: SocketAddr) -> RequestService<Incoming, E> {
-        RequestService {
-            router: self.router.clone(),
-            remote_addr,
-        }
-    }
-}
-
-impl<E: Into<Box<dyn std::error::Error + Send + Sync>> + 'static> RequestServiceBuilder<Empty<Bytes>, E> {
-    pub fn new(mut router: Router<Empty<Bytes>, E>) -> crate::Result<Self> {
-        // router.init_keep_alive_middleware();
-
-        router.init_global_options_route();
-        router.init_default_404_route();
-
-        router.init_err_handler();
-
-        router.init_regex_set()?;
-        router.init_req_info_gen();
-        Ok(Self {
-            router: Arc::from(router),
-        })
-    }
-
-    pub fn build(&self, remote_addr: SocketAddr) -> RequestService<Empty<Bytes>, E> {
+    pub fn build(&self, remote_addr: SocketAddr) -> RequestService<T, E> {
         RequestService {
             router: self.router.clone(),
             remote_addr,

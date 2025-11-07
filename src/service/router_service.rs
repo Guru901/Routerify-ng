@@ -1,6 +1,6 @@
 use crate::router::Router;
 use crate::service::request_service::{RequestService, RequestServiceBuilder};
-use hyper::body::Incoming;
+use hyper::body::{Body, Incoming};
 use hyper::service::Service;
 use std::convert::Infallible;
 use std::future::{Ready, ready};
@@ -79,11 +79,11 @@ pub struct RouterService<T, E> {
     builder: RequestServiceBuilder<T, E>,
 }
 
-impl<E: Into<Box<dyn std::error::Error + Send + Sync>> + 'static> RouterService<Incoming, E> {
+impl<T: Body + Send + 'static, E: Into<Box<dyn std::error::Error + Send + Sync>> + 'static> RouterService<T, E> {
     /// Creates a new service with the provided router and it's ready to be used with the hyper [`serve`](https://docs.rs/hyper/0.14.4/hyper/server/struct.Builder.html#method.serve)
     /// method.
-    pub fn new(router: Router<Incoming, E>) -> crate::Result<RouterService<Incoming, E>> {
-        let builder = RequestServiceBuilder::<Incoming, E>::new(router)?;
+    pub fn new(router: Router<T, E>) -> crate::Result<RouterService<T, E>> {
+        let builder = RequestServiceBuilder::new(router)?;
         Ok(RouterService { builder })
     }
 }
