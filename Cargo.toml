@@ -1,6 +1,6 @@
 [package]
 name = "routerify_ng"
-version = "0.1.0"
+version = "0.2.0"
 description = "A lightweight, idiomatic, composable and modular router implementation with middleware support for the Rust HTTP library hyper.rs 1.7."
 homepage = "https://github.com/guru901/routerify_ng"
 repository = "https://github.com/guru901/routerify_ng"
