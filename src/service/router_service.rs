@@ -1,6 +1,5 @@
 use crate::router::Router;
 use crate::service::request_service::{RequestService, RequestServiceBuilder};
-use hyper::body::{Body, Incoming};
 use hyper::service::Service;
 use std::convert::Infallible;
 use std::future::{Ready, ready};
@@ -20,7 +19,6 @@ use tokio::net::TcpStream;
 /// ```no_run
 /// use http_body_util::Full;
 /// use hyper::body::Bytes;
-/// use hyper::body::Incoming;
 /// use hyper::service::Service;
 /// use hyper::{Request, Response};
 /// use hyper_util::rt::TokioExecutor;
@@ -32,11 +30,11 @@ use tokio::net::TcpStream;
 /// use std::sync::Arc;
 /// use tokio::net::TcpListener;
 ///
-/// async fn home(_: Request<Incoming>) -> Result<Response<Full<Bytes>>, Infallible> {
+/// async fn home(_: Request<Full<Bytes>>) -> Result<Response<Full<Bytes>>, Infallible> {
 ///     Ok(Response::new(Full::new(Bytes::from("Home page"))))
 /// }
 ///
-/// fn router() -> Router<Incoming, Infallible> {
+/// fn router() -> Router<Infallible> {
 ///     Router::builder().get("/", home).build().unwrap()
 /// }
 ///
@@ -75,21 +73,21 @@ use tokio::net::TcpStream;
 /// }
 /// ```
 #[derive(Debug)]
-pub struct RouterService<T, E> {
-    builder: RequestServiceBuilder<T, E>,
+pub struct RouterService<E> {
+    builder: RequestServiceBuilder<E>,
 }
 
-impl<T: Body + Send + 'static, E: Into<Box<dyn std::error::Error + Send + Sync>> + 'static> RouterService<T, E> {
+impl<E: Into<Box<dyn std::error::Error + Send + Sync>> + 'static> RouterService<E> {
     /// Creates a new service with the provided router and it's ready to be used with the hyper [`serve`](https://docs.rs/hyper/0.14.4/hyper/server/struct.Builder.html#method.serve)
     /// method.
-    pub fn new(router: Router<T, E>) -> crate::Result<RouterService<T, E>> {
+    pub fn new(router: Router<E>) -> crate::Result<RouterService<E>> {
         let builder = RequestServiceBuilder::new(router)?;
         Ok(RouterService { builder })
     }
 }
 
-impl<E: Into<Box<dyn std::error::Error + Send + Sync>> + 'static> Service<&TcpStream> for RouterService<Incoming, E> {
-    type Response = RequestService<Incoming, E>;
+impl<E: Into<Box<dyn std::error::Error + Send + Sync>> + 'static> Service<&TcpStream> for RouterService<E> {
+    type Response = RequestService<E>;
     type Error = Infallible;
     type Future = Ready<Result<Self::Response, Self::Error>>;
 

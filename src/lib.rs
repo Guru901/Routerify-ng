@@ -56,7 +56,7 @@
 //! struct State(u64);
 //!
 //! // A handler for "/" page.
-//! async fn home_handler(req: Request<Incoming>) -> Result<Response<Full<Bytes>>, Infallible> {
+//! async fn home_handler(req: Request<Full<Bytes>>) -> Result<Response<Full<Bytes>>, Infallible> {
 //!     // Access the app state.
 //!     let state = req.data::<State>().unwrap();
 //!     println!("State value: {}", state.0);
@@ -65,13 +65,13 @@
 //! }
 //!
 //! // A handler for "/users/:userId" page.
-//! async fn user_handler(req: Request<Incoming>) -> Result<Response<Full<Bytes>>, Infallible> {
+//! async fn user_handler(req: Request<Full<Bytes>>) -> Result<Response<Full<Bytes>>, Infallible> {
 //!     let user_id = req.param("userId").unwrap();
 //!     Ok(Response::new(Full::new(Bytes::from(format!("Hello {}", user_id)))))
 //! }
 //!
 //! // A middleware which logs an http request.
-//! async fn logger(req: Request<Incoming>) -> Result<Request<Incoming>, Infallible> {
+//! async fn logger(req: Request<Full<Bytes>>) -> Result<Request<Full<Bytes>>, Infallible> {
 //!     println!("{} {} {}", req.remote_addr(), req.method(), req.uri().path());
 //!     Ok(req)
 //! }
@@ -86,9 +86,9 @@
 //!         .unwrap()
 //! }
 //!
-//! // Create a `Router<Incoming, Infallible>` for response body type `Full<hyper::body::Bytes>`
+//! // Create a `Router<Infallible>` for response body type `Full<hyper::body::Bytes>`
 //! // and for handler error type `Infallible`.
-//! fn router() -> Router<Incoming, Infallible> {
+//! fn router() -> Router<Infallible> {
 //!     // Create a router and specify the logger middleware and the handlers.
 //!     // Here, "Middleware::pre" means we're adding a pre middleware which will be executed
 //!     // before any route handlers.
@@ -157,11 +157,11 @@
 //! use std::convert::Infallible;
 //!
 //! // A handler for "/about" page.
-//! async fn about_handler(_: Request<Incoming>) -> Result<Response<Full<Bytes>>, Infallible> {
+//! async fn about_handler(_: Request<Full<Bytes>>) -> Result<Response<Full<Bytes>>, Infallible> {
 //!     Ok(Response::new(Full::new(Bytes::from("About page"))))
 //! }
 //!
-//! # fn run() -> Router<Incoming, Infallible> {
+//! # fn run() -> Router<Infallible> {
 //! let router = Router::builder().get("/about", about_handler).build().unwrap();
 //! # router
 //! # }
@@ -177,7 +177,7 @@
 //! # use std::convert::Infallible;
 //! use hyper::body::Incoming;
 //!
-//! # fn run() -> Router<Incoming, Infallible> {
+//! # fn run() -> Router<Infallible> {
 //! let router = Router::builder()
 //!     .get("/about", |req| async move {
 //!         Ok(Response::new(Full::new(Bytes::from("About page"))))
@@ -206,7 +206,7 @@
 //! # use std::convert::Infallible;
 //! use hyper::body::Incoming;
 //!
-//! # fn run() -> Router<Incoming, Infallible> {
+//! # fn run() -> Router<Infallible> {
 //! let router = Router::builder()
 //!     .get("/about", |req| async move {
 //!         Ok(Response::new(Full::new(Bytes::from("About page"))))
@@ -227,7 +227,7 @@
 //! # use std::convert::Infallible;
 //! use hyper::body::Incoming;
 //!
-//! # fn run() -> Router<Incoming, Infallible> {
+//! # fn run() -> Router<Infallible> {
 //! let router = Router::builder()
 //!     .get("/users/*", |req| async move {
 //!         Ok(Response::new(Full::new(Bytes::from(
@@ -252,7 +252,7 @@
 //! # use std::convert::Infallible;
 //! use hyper::body::Incoming;
 //!
-//! # fn run() -> Router<Incoming, Infallible> {
+//! # fn run() -> Router<Infallible> {
 //! let router = Router::builder()
 //!     .get(
 //!         "/users",
@@ -294,7 +294,7 @@
 //! # use std::convert::Infallible;
 //! use hyper::body::Incoming;
 //!
-//! # fn run() -> Router<Incoming, Infallible> {
+//! # fn run() -> Router<Infallible> {
 //! let router = Router::builder()
 //!     .get("/users/:userName/books/:bookName", |req| async move {
 //!         let user_name = req.param("userName").unwrap();
@@ -327,7 +327,7 @@
 //! use std::convert::Infallible;
 //! use hyper::body::Incoming;
 //!
-//! fn api_router() -> Router<Incoming, Infallible> {
+//! fn api_router() -> Router<Infallible> {
 //!     Router::builder()
 //!         .get("/books", |req| async move {
 //!             Ok(Response::new(Full::new(Bytes::from("List of books"))))
@@ -342,7 +342,7 @@
 //!         .unwrap()
 //! }
 //!
-//! # fn run() -> Router<Incoming, Infallible> {
+//! # fn run() -> Router<Infallible> {
 //! let router = Router::builder()
 //!     // Mounts the API router at "/api" path .
 //!     .scope("/api", api_router())
@@ -378,10 +378,12 @@
 //! use hyper::{body::Incoming, Request};
 //! use routerify_ng::{Middleware, Router};
 //! use std::convert::Infallible;
+//! use hyper::body::Bytes;
+//! use http_body_util::Full;
 //!
 //! // The handler for a pre middleware.
 //! // It accepts a `req` and it transforms the `req` and passes it to the next middlewares.
-//! async fn my_pre_middleware_handler(req: Request<Incoming>) -> Result<Request<Incoming>, Infallible> {
+//! async fn my_pre_middleware_handler(req: Request<Full<Bytes>>) -> Result<Request<Full<Bytes>>, Infallible> {
 //!     // Do some changes if required.
 //!     let transformed_req = req;
 //!
@@ -390,7 +392,7 @@
 //!     Ok(transformed_req)
 //! }
 //!
-//! # fn run() -> Router<Incoming, Infallible> {
+//! # fn run() -> Router<Infallible> {
 //! let router = Router::builder()
 //!     // Create a pre middleware instance by `Middleware::pre` method
 //!     // and attach it.
@@ -412,13 +414,15 @@
 //! use routerify_ng::prelude::*;
 //! use routerify_ng::{Middleware, Router};
 //! use std::convert::Infallible;
+//! use hyper::body::Bytes;
+//! use http_body_util::Full;
 //!
-//! async fn logger_middleware_handler(req: Request<Incoming>) -> Result<Request<Incoming>, Infallible> {
+//! async fn logger_middleware_handler(req: Request<Full<Bytes>>) -> Result<Request<Full<Bytes>>, Infallible> {
 //!     println!("{} {} {}", req.remote_addr(), req.method(), req.uri().path());
 //!     Ok(req)
 //! }
 //!
-//! # fn run() -> Router<Incoming, Infallible> {
+//! # fn run() -> Router<Infallible> {
 //! let router = Router::builder()
 //!     .middleware(Middleware::pre(logger_middleware_handler))
 //!     .build()
@@ -452,7 +456,7 @@
 //!     Ok(transformed_res)
 //! }
 //!
-//! # fn run() -> Router<Incoming, Infallible> {
+//! # fn run() -> Router<Infallible> {
 //! let router = Router::builder()
 //!     // Create a post middleware instance by `Middleware::post` method
 //!     // and attach it.
@@ -484,7 +488,7 @@
 //!     Ok(res)
 //! }
 //!
-//! # fn run() -> Router<Incoming, Infallible> {
+//! # fn run() -> Router<Infallible> {
 //! let router = Router::builder()
 //!     .middleware(Middleware::post(my_post_middleware_handler))
 //!     .build()
@@ -521,7 +525,7 @@
 //!     Ok(transformed_res)
 //! }
 //!
-//! # fn run() -> Router<Incoming, Infallible> {
+//! # fn run() -> Router<Infallible> {
 //! let router = Router::builder()
 //!     // Create a post middleware instance by `Middleware::post_with_info` method
 //!     // and attach it.
@@ -564,7 +568,7 @@
 //! struct State(u64);
 //!
 //! // A handler for "/" page.
-//! async fn home_handler(req: Request<Incoming>) -> Result<Response<Full<Bytes>>, Infallible> {
+//! async fn home_handler(req: Request<Full<Bytes>>) -> Result<Response<Full<Bytes>>, Infallible> {
 //!     // Access the app state.
 //!     let state = req.data::<State>().unwrap();
 //!     println!("State value: {}", state.0);
@@ -573,7 +577,7 @@
 //! }
 //!
 //! // A middleware which logs an http request.
-//! async fn logger(req: Request<Incoming>) -> Result<Request<Incoming>, Infallible> {
+//! async fn logger(req: Request<Full<Bytes>>) -> Result<Request<Full<Bytes>>, Infallible> {
 //!     // You can also access the same state from middleware.
 //!     let state = req.data::<State>().unwrap();
 //!     println!("State value: {}", state.0);
@@ -596,9 +600,9 @@
 //!         .unwrap()
 //! }
 //!
-//! // Create a `Router<Incoming, Infallible>` for response body type `hyper::Body`
+//! // Create a `Router<Infallible>` for response body type `hyper::Body`
 //! // and for handler error type `Infallible`.
-//! fn router() -> Router<Incoming, Infallible> {
+//! fn router() -> Router<Infallible> {
 //!     Router::builder()
 //!         // Specify the state data which will be available to every route handlers,
 //!         // error handler and middlewares.
@@ -626,7 +630,7 @@
 //!     # use hyper::{Request, Response, StatusCode};
 //!     use hyper::body::Incoming;
 //!
-//!     pub fn router() -> Router<Incoming, Infallible> {
+//!     pub fn router() -> Router<Infallible> {
 //!         Router::builder()
 //!             // Specify data for this sub-router only.
 //!             .data("Data for foo router")
@@ -641,7 +645,7 @@
 //!     # use hyper::{Request, Response, StatusCode};
 //!     use hyper::body::Incoming;
 //!
-//!     pub fn router() -> Router<Incoming, Infallible> {
+//!     pub fn router() -> Router<Infallible> {
 //!         Router::builder()
 //!             // Specify data for this sub-router only.
 //!             .data("Data for bar router")
@@ -650,7 +654,7 @@
 //!     }
 //! }
 //!
-//! fn router() -> Router<Incoming, Infallible> {
+//! fn router() -> Router<Infallible> {
 //!     Router::builder()
 //!         // This data will be available to all the child sub-routers.
 //!         .data(100_u32)
@@ -671,7 +675,7 @@
 //! # use std::{convert::Infallible, net::SocketAddr};
 //! # use hyper::body::Incoming;
 //! # use std::sync::Mutex;
-//! fn router() -> Router<Incoming, Infallible> {
+//! fn router() -> Router<Infallible> {
 //!     Router::builder()
 //!         // Share multiple data, a single data for each data type.
 //!         .data(100_u32)
@@ -716,7 +720,7 @@
 //!       .unwrap()
 //! }
 //!
-//! # fn run() -> Router<Incoming, hyper::Error> {
+//! # fn run() -> Router<hyper::Error> {
 //! let router = Router::builder()
 //!      .get("/users", |req| async move { Ok(Response::new(Full::new(Bytes::from("It might raise an error")))) })
 //!      // Here attach the custom error handler defined above.
@@ -749,7 +753,7 @@
 //!       .unwrap()
 //! }
 //!
-//! # fn run() -> Router<Incoming, hyper::Error> {
+//! # fn run() -> Router<hyper::Error> {
 //! let router = Router::builder()
 //!      .get("/users", |req| async move { Ok(Response::new(Full::new(Bytes::from("It might raise an error")))) })
 //!      // Now register this error handler.

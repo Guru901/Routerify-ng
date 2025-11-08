@@ -1,6 +1,5 @@
 use http_body_util::Full;
 use hyper::Response;
-use hyper::body::Incoming;
 use hyper::service::Service;
 use hyper_util::rt::TokioExecutor;
 use hyper_util::rt::TokioIo;
@@ -11,7 +10,7 @@ use std::sync::Arc;
 use std::{convert::Infallible, net::SocketAddr};
 use tokio::net::TcpListener;
 
-fn router() -> Router<Incoming, Infallible> {
+fn router() -> Router<Infallible> {
     let mut builder = Router::builder();
 
     for i in 0..3000_usize {

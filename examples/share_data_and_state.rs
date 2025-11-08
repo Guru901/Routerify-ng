@@ -1,6 +1,5 @@
 use bytes::Bytes;
 use http_body_util::Full;
-use hyper::body::Incoming;
 use hyper::service::Service;
 use hyper::{Request, Response, StatusCode};
 use hyper_util::rt::TokioExecutor;
@@ -19,7 +18,7 @@ use tokio::net::TcpListener;
 struct State(u64);
 
 // A handler for "/" page.
-async fn home_handler(req: Request<Incoming>) -> Result<Response<Full<Bytes>>, Infallible> {
+async fn home_handler(req: Request<Full<Bytes>>) -> Result<Response<Full<Bytes>>, Infallible> {
     // Access the app state.
     let state = req.data::<State>().unwrap();
     println!("State value: {}", state.0);
@@ -28,7 +27,7 @@ async fn home_handler(req: Request<Incoming>) -> Result<Response<Full<Bytes>>, I
 }
 
 // A middleware which logs an http request.
-async fn logger(req: Request<Incoming>) -> Result<Request<Incoming>, Infallible> {
+async fn logger(req: Request<Full<Bytes>>) -> Result<Request<Full<Bytes>>, Infallible> {
     // You can also access the same state from middleware.
     let state = req.data::<State>().unwrap();
     println!("State value: {}", state.0);
@@ -53,7 +52,7 @@ async fn error_handler(err: routerify_ng::RouteError, req_info: RequestInfo) -> 
 
 // Create a `Router<Body, Infallible>` for response body type `hyper::Body`
 // and for handler error type `Infallible`.
-fn router() -> Router<Incoming, Infallible> {
+fn router() -> Router<Infallible> {
     Router::builder()
         // Specify the state data which will be available to every route handlers,
         // error handler and middlewares.

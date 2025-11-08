@@ -1,6 +1,5 @@
 use bytes::Bytes;
 use http_body_util::Full;
-use hyper::body::Incoming;
 use hyper::service::Service;
 use hyper::{Request, Response, StatusCode};
 use hyper_util::rt::{TokioExecutor, TokioIo};
@@ -14,7 +13,7 @@ use tokio::net::TcpListener;
 #[derive(Clone)]
 pub struct State(pub i32);
 
-pub async fn pre_middleware(req: Request<Incoming>) -> Result<Request<Incoming>, routerify_ng::Error> {
+pub async fn pre_middleware(req: Request<Full<Bytes>>) -> Result<Request<Full<Bytes>>, routerify_ng::Error> {
     let data = req.data::<State>().map(|s| s.0).unwrap_or(0);
     println!("Pre Data: {}", data);
     println!("Pre Data2: {:?}", req.data::<u32>());
@@ -32,7 +31,7 @@ pub async fn post_middleware(
     Ok(res)
 }
 
-pub async fn home_handler(req: Request<Incoming>) -> Result<Response<Full<Bytes>>, routerify_ng::Error> {
+pub async fn home_handler(req: Request<Full<Bytes>>) -> Result<Response<Full<Bytes>>, routerify_ng::Error> {
     let data = req.data::<State>().map(|s| s.0).unwrap_or(0);
     println!("Route Data: {}", data);
     println!("Route Data2: {:?}", req.data::<u32>());
@@ -52,10 +51,10 @@ async fn error_handler(err: routerify_ng::RouteError, req_info: RequestInfo) -> 
         .unwrap()
 }
 
-fn router2() -> Router<Incoming, routerify_ng::Error> {
+fn router2() -> Router<routerify_ng::Error> {
     Router::builder()
         .data(111_u32)
-        .get("/a", |req: Request<Incoming>| async move {
+        .get("/a", |req: Request<Full<Bytes>>| async move {
             println!("Router2 Data: {:?}", req.data::<&str>());
             println!("Router2 Data: {:?}", req.data::<State>().map(|s| s.0));
             println!("Router2 Data: {:?}", req.data::<u32>());
@@ -65,10 +64,10 @@ fn router2() -> Router<Incoming, routerify_ng::Error> {
         .unwrap()
 }
 
-fn router3() -> Router<Incoming, routerify_ng::Error> {
+fn router3() -> Router<routerify_ng::Error> {
     Router::builder()
         .data(555_u32)
-        .get("/h/g/j", |req: Request<Incoming>| async move {
+        .get("/h/g/j", |req: Request<Full<Bytes>>| async move {
             println!("Router3 Data: {:?}", req.data::<&str>());
             println!("Router3 Data: {:?}", req.data::<State>().map(|s| s.0));
             println!("Router3 Data: {:?}", req.data::<u32>());
@@ -80,7 +79,7 @@ fn router3() -> Router<Incoming, routerify_ng::Error> {
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
-    let router: Router<Incoming, routerify_ng::Error> = Router::builder()
+    let router: Router<routerify_ng::Error> = Router::builder()
         .data(State(100))
         .scope("/r", router2())
         .scope("/bcd", router3())

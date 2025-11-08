@@ -91,9 +91,9 @@ impl RequestInfo {
     /// use routerify_ng::{Middleware, RequestInfo, Router};
     /// use std::convert::Infallible;
     ///
-    /// fn run() -> Router<Incoming, Infallible> {
+    /// fn run() -> Router<Infallible> {
     ///     let router = Router::builder()
-    ///         .middleware(Middleware::pre(|req: Request<Incoming>| async move {
+    ///         .middleware(Middleware::pre(|req: Request<Full<Bytes>>| async move {
     ///             req.set_context("example".to_string());
     ///
     ///             Ok(req)

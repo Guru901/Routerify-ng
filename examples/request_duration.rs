@@ -1,6 +1,5 @@
 use bytes::Bytes;
 use http_body_util::Full;
-use hyper::body::Incoming;
 use hyper::service::Service;
 use hyper::{Request, Response};
 use hyper_util::rt::TokioExecutor;
@@ -14,12 +13,12 @@ use std::net::SocketAddr;
 use std::sync::Arc;
 use tokio::net::TcpListener;
 
-async fn before(req: Request<Incoming>) -> Result<Request<Incoming>, Infallible> {
+async fn before(req: Request<Full<Bytes>>) -> Result<Request<Full<Bytes>>, Infallible> {
     req.set_context(tokio::time::Instant::now());
     Ok(req)
 }
 
-async fn hello(_: Request<Incoming>) -> Result<Response<Full<Bytes>>, Infallible> {
+async fn hello(_: Request<Full<Bytes>>) -> Result<Response<Full<Bytes>>, Infallible> {
     Ok(Response::new(Full::from("Home page")))
 }
 
@@ -30,7 +29,7 @@ async fn after(res: Response<Full<Bytes>>, req_info: RequestInfo) -> Result<Resp
     Ok(res)
 }
 
-fn router() -> Router<Incoming, Infallible> {
+fn router() -> Router<Infallible> {
     Router::builder()
         .get("/", hello)
         .middleware(Middleware::pre(before))

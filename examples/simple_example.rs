@@ -1,6 +1,5 @@
 use bytes::Bytes;
 use http_body_util::Full;
-use hyper::body::Incoming;
 use hyper::service::Service;
 use hyper::{Request, Response};
 use hyper_util::rt::TokioExecutor;
@@ -13,22 +12,22 @@ use std::{convert::Infallible, net::SocketAddr, sync::Arc};
 use tokio::net::TcpListener;
 
 // A handler for "/" page.
-async fn home_handler(_: Request<Incoming>) -> Result<Response<Full<Bytes>>, Infallible> {
+async fn home_handler(_: Request<Full<Bytes>>) -> Result<Response<Full<Bytes>>, Infallible> {
     Ok(Response::new(Full::from("Home page")))
 }
 
 // A handler for "/about" page.
-async fn about_handler(_: Request<Incoming>) -> Result<Response<Full<Bytes>>, Infallible> {
+async fn about_handler(_: Request<Full<Bytes>>) -> Result<Response<Full<Bytes>>, Infallible> {
     Ok(Response::new(Full::from("About page")))
 }
 
 // A middleware which logs an http request.
-async fn logger(req: Request<Incoming>) -> Result<Request<Incoming>, Infallible> {
+async fn logger(req: Request<Full<Bytes>>) -> Result<Request<Full<Bytes>>, Infallible> {
     println!("{} {} {}", req.remote_addr(), req.method(), req.uri().path());
     Ok(req)
 }
 
-fn router() -> Router<Incoming, Infallible> {
+fn router() -> Router<Infallible> {
     // Create a router and specify the logger middleware and the handlers.
     // Here, "Middleware::pre" means we're adding a pre middleware which will be executed
     // before any route handlers.

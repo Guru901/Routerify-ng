@@ -1,6 +1,5 @@
 use bytes::Bytes;
 use http_body_util::Full;
-use hyper::body::Incoming;
 use hyper::service::Service;
 use hyper::{Request, Response, StatusCode};
 use hyper_util::rt::TokioExecutor;
@@ -13,24 +12,24 @@ use std::sync::Arc;
 use tokio::net::TcpListener;
 
 // A handler for "/" page.
-async fn home_handler(_: Request<Incoming>) -> Result<Response<Full<Bytes>>, io::Error> {
+async fn home_handler(_: Request<Full<Bytes>>) -> Result<Response<Full<Bytes>>, io::Error> {
     Ok(Response::new(Full::from("Home page")))
 }
 
 // A handler for "/about" page.
-async fn about_handler(_: Request<Incoming>) -> Result<Response<Full<Bytes>>, io::Error> {
+async fn about_handler(_: Request<Full<Bytes>>) -> Result<Response<Full<Bytes>>, io::Error> {
     Ok(Response::new(Full::from("About page")))
 }
 
 // Define a handler to handle any non-existent routes i.e. a 404 handler.
-async fn handler_404(_: Request<Incoming>) -> Result<Response<Full<Bytes>>, io::Error> {
+async fn handler_404(_: Request<Full<Bytes>>) -> Result<Response<Full<Bytes>>, io::Error> {
     Ok(Response::builder()
         .status(StatusCode::NOT_FOUND)
         .body(Full::from("Page Not Found"))
         .unwrap())
 }
 
-fn router() -> Router<Incoming, io::Error> {
+fn router() -> Router<io::Error> {
     // Create a router and specify the the handlers.
     Router::builder()
         .get("/", home_handler)

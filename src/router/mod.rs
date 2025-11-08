@@ -6,7 +6,6 @@ use crate::middleware::{PostMiddleware, PreMiddleware};
 use crate::route::Route;
 use crate::types::RequestInfo;
 use http_body_util::Full;
-use hyper::body::Body;
 use hyper::body::Bytes;
 use hyper::{Method, Request, Response, StatusCode, header};
 use regex::RegexSet;
@@ -43,26 +42,23 @@ pub(crate) type ErrHandlerWithInfoReturn = Box<dyn Future<Output = Response<Full
 ///
 /// ```
 /// use http_body_util::Full;
-/// use hyper::{
-///     body::{Bytes, Incoming},
-///     Request, Response,
-/// };
+/// use hyper::{Request, Response, body::Bytes};
 /// use routerify_ng::Router;
 ///
 /// // A handler for "/about" page.
 /// // We will use hyper::Body as response body type and hyper::Error as error type.
-/// async fn about_handler(_: Request<Incoming>) -> Result<Response<Full<Bytes>>, hyper::Error> {
+/// async fn about_handler(_: Request<Full<Bytes>>) -> Result<Response<Full<Bytes>>, hyper::Error> {
 ///     Ok(Response::new(Full::new(Bytes::from("About page"))))
 /// }
 ///
-/// fn run() -> Router<Incoming, hyper::Error> {
-///     let router: Router<Incoming, hyper::Error> = Router::builder().get("/about", about_handler).build().unwrap();
+/// fn run() -> Router<hyper::Error> {
+///     let router: Router<hyper::Error> = Router::builder().get("/about", about_handler).build().unwrap();
 ///     router
 /// }
 /// ```
-pub struct Router<T, E> {
-    pub(crate) pre_middlewares: Vec<PreMiddleware<T, E>>,
-    pub(crate) routes: Vec<Route<T, E>>,
+pub struct Router<E> {
+    pub(crate) pre_middlewares: Vec<PreMiddleware<E>>,
+    pub(crate) routes: Vec<Route<E>>,
     pub(crate) post_middlewares: Vec<PostMiddleware<E>>,
     pub(crate) scoped_data_maps: Vec<ScopedDataMap>,
 
@@ -93,10 +89,10 @@ impl ErrHandler {
     }
 }
 
-impl<T: Body + 'static, E: Into<Box<dyn std::error::Error + Send + Sync>> + 'static> Router<T, E> {
+impl<E: Into<Box<dyn std::error::Error + Send + Sync>> + 'static> Router<E> {
     pub(crate) fn new(
-        pre_middlewares: Vec<PreMiddleware<T, E>>,
-        routes: Vec<Route<T, E>>,
+        pre_middlewares: Vec<PreMiddleware<E>>,
+        routes: Vec<Route<E>>,
         post_middlewares: Vec<PostMiddleware<E>>,
         scoped_data_maps: Vec<ScopedDataMap>,
         err_handler: Option<ErrHandler>,
@@ -166,7 +162,7 @@ impl<T: Body + 'static, E: Into<Box<dyn std::error::Error + Send + Sync>> + 'sta
         }
 
         if let Some(router) = self.downcast_to_hyper_body_type() {
-            let options_route: Route<T, E> = Route::new("/*", options_method, |_req| async move {
+            let options_route: Route<E> = Route::new("/*", options_method, |_req| async move {
                 Ok(Response::builder()
                     .status(StatusCode::NO_CONTENT)
                     .body(Full::new(Bytes::new()))
@@ -194,7 +190,7 @@ impl<T: Body + 'static, E: Into<Box<dyn std::error::Error + Send + Sync>> + 'sta
         }
 
         if let Some(router) = self.downcast_to_hyper_body_type() {
-            let default_404_route: Route<T, E> =
+            let default_404_route: Route<E> =
                 Route::new("/*", constants::ALL_POSSIBLE_HTTP_METHODS.to_vec(), |_req| async move {
                     Ok(Response::builder()
                         .status(StatusCode::NOT_FOUND)
@@ -238,20 +234,20 @@ impl<T: Body + 'static, E: Into<Box<dyn std::error::Error + Send + Sync>> + 'sta
         }
     }
 
-    fn downcast_to_hyper_body_type(&mut self) -> Option<&mut Router<T, E>> {
+    fn downcast_to_hyper_body_type(&mut self) -> Option<&mut Router<E>> {
         let any_obj: &mut dyn Any = self;
-        any_obj.downcast_mut::<Router<T, E>>()
+        any_obj.downcast_mut::<Router<E>>()
     }
 
     /// Return a [RouterBuilder](./struct.RouterBuilder.html) instance to build a `Router`.
-    pub fn builder() -> RouterBuilder<T, E> {
+    pub fn builder() -> RouterBuilder<E> {
         builder::RouterBuilder::new()
     }
 
     pub(crate) async fn process(
         &self,
         target_path: &str,
-        mut req: Request<T>,
+        mut req: Request<Full<Bytes>>,
         mut req_info: Option<RequestInfo>,
     ) -> crate::Result<Response<Full<Bytes>>> {
         let (
@@ -302,7 +298,9 @@ impl<T: Body + 'static, E: Into<Box<dyn std::error::Error + Send + Sync>> + 'sta
                     let route = &self.routes[idx];
 
                     if route.is_match_method(transformed_req.method()) {
-                        let route_resp_res = route.process(target_path, transformed_req).await;
+                        // Convert transformed_req to the expected type for route.process
+                        let req_for_route = transformed_req.map(|b| Full::from(b));
+                        let route_resp_res = route.process(target_path, req_for_route).await;
 
                         let route_resp = match route_resp_res {
                             Ok(route_resp) => route_resp,
@@ -354,11 +352,11 @@ impl<T: Body + 'static, E: Into<Box<dyn std::error::Error + Send + Sync>> + 'sta
 
     async fn execute_pre_middleware(
         &self,
-        req: Request<T>,
+        req: Request<Full<Bytes>>,
         matched_pre_middleware_idxs: Vec<usize>,
         route_scope_depth: Option<u32>,
         req_info: Option<RequestInfo>,
-    ) -> crate::Result<Result<Request<T>, Response<Full<Bytes>>>> {
+    ) -> crate::Result<Result<Request<Full<Bytes>>, Response<Full<Bytes>>>> {
         let mut transformed_req = req;
         for idx in matched_pre_middleware_idxs {
             let pre_middleware = &self.pre_middlewares[idx];
@@ -424,7 +422,7 @@ impl<T: Body + 'static, E: Into<Box<dyn std::error::Error + Send + Sync>> + 'sta
     }
 }
 
-impl<T, E> Debug for Router<T, E> {
+impl<E> Debug for Router<E> {
     fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
         write!(
             f,

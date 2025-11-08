@@ -1,6 +1,5 @@
 use bytes::Bytes;
 use http_body_util::Full;
-use hyper::body::Incoming;
 use hyper::service::Service;
 use hyper::{Request, Response, StatusCode, header};
 use hyper_util::rt::{TokioExecutor, TokioIo};
@@ -12,12 +11,12 @@ use std::sync::Arc;
 use tokio::net::TcpListener;
 
 // A handler for "/" page.
-async fn home_handler(_: Request<Incoming>) -> Result<Response<Full<Bytes>>, io::Error> {
+async fn home_handler(_: Request<Full<Bytes>>) -> Result<Response<Full<Bytes>>, io::Error> {
     Err(io::Error::other("Some errors"))
 }
 
 // A handler for "/about" page.
-async fn about_handler(_: Request<Incoming>) -> Result<Response<Full<Bytes>>, io::Error> {
+async fn about_handler(_: Request<Full<Bytes>>) -> Result<Response<Full<Bytes>>, io::Error> {
     Ok(Response::new(Full::from("About page")))
 }
 
@@ -36,7 +35,7 @@ async fn error_handler(err: routerify_ng::RouteError, req_info: RequestInfo) -> 
         .unwrap()
 }
 
-fn router() -> Router<Incoming, io::Error> {
+fn router() -> Router<io::Error> {
     // Create a router and specify the the handlers.
     Router::builder()
         .get("/", home_handler)

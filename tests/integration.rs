@@ -1,7 +1,6 @@
 use self::support::{into_text, serve};
 use http_body_util::Full;
 use hyper::body::Bytes;
-use hyper::body::Incoming;
 use hyper::{Request, Response, StatusCode};
 use hyper_util::client::legacy::Client;
 use hyper_util::rt::TokioExecutor;
@@ -15,7 +14,7 @@ mod support;
 #[tokio::test]
 async fn can_perform_simple_get_request() {
     const RESPONSE_TEXT: &str = "Hello world";
-    let router: Router<Incoming, routerify_ng::Error> = Router::builder()
+    let router: Router<routerify_ng::Error> = Router::builder()
         .get("/", |_| async move { Ok(Response::new(RESPONSE_TEXT.into())) })
         .err_handler(|_: RouteError| async move { todo!() })
         .build()
@@ -40,7 +39,7 @@ async fn can_perform_simple_get_request() {
 async fn can_perform_simple_get_request_boxed_error() {
     const RESPONSE_TEXT: &str = "Hello world";
     type BoxedError = Box<dyn std::error::Error + Sync + Send + 'static>;
-    let router: Router<Incoming, BoxedError> = Router::builder()
+    let router: Router<BoxedError> = Router::builder()
         .get("/", |_| async move { Ok(Response::new(RESPONSE_TEXT.into())) })
         .err_handler(|_: RouteError| async move { todo!() })
         .build()
@@ -70,11 +69,11 @@ async fn can_respond_with_data_from_scope_state() {
         struct State {
             count: Arc<Mutex<u8>>,
         }
-        async fn list(req: Request<Incoming>) -> Result<Response<Full<Bytes>>, io::Error> {
+        async fn list(req: Request<Full<Bytes>>) -> Result<Response<Full<Bytes>>, io::Error> {
             let count = req.data::<State>().unwrap().count.lock().unwrap();
             Ok(Response::new(Full::from(format!("{}", count))))
         }
-        pub fn router() -> Router<Incoming, io::Error> {
+        pub fn router() -> Router<io::Error> {
             let state = State {
                 count: Arc::new(Mutex::new(1)),
             };
@@ -84,17 +83,16 @@ async fn can_respond_with_data_from_scope_state() {
 
     mod service2 {
         use super::*;
-        use hyper::body::Incoming;
 
         #[derive(Clone)]
         struct State {
             count: Arc<Mutex<u8>>,
         }
-        async fn list(req: Request<Incoming>) -> Result<Response<Full<Bytes>>, io::Error> {
+        async fn list(req: Request<Full<Bytes>>) -> Result<Response<Full<Bytes>>, io::Error> {
             let count = req.data::<State>().unwrap().count.lock().unwrap();
             Ok(Response::new(Full::new(Bytes::from(format!("{}", count)))))
         }
-        pub fn router() -> Router<Incoming, io::Error> {
+        pub fn router() -> Router<io::Error> {
             let state = State {
                 count: Arc::new(Mutex::new(2)),
             };
@@ -154,14 +152,14 @@ async fn can_propagate_request_context() {
     #[derive(Debug, Clone, PartialEq)]
     struct Id2(u32);
 
-    let before = |req: Request<Incoming>| async move {
+    let before = |req: Request<Full<Bytes>>| async move {
         req.set_context(Id(42));
         let (parts, body) = req.into_parts();
         parts.set_context(Id2(42));
         Ok(Request::from_parts(parts, body))
     };
 
-    let index = |req: Request<Incoming>| async move {
+    let index = |req: Request<Full<Bytes>>| async move {
         // Check `id` from `before()`.
         let id = req.context::<Id>().unwrap();
         assert_eq!(id, Id(42));
@@ -222,7 +220,7 @@ async fn can_propagate_request_context() {
         Ok(res)
     };
 
-    let router: Router<Incoming, std::io::Error> = Router::builder()
+    let router: Router<std::io::Error> = Router::builder()
         .middleware(Middleware::pre(before))
         .middleware(Middleware::post_with_info(after))
         .err_handler_with_info(error_handler)
@@ -248,7 +246,7 @@ async fn can_propagate_request_context() {
 #[tokio::test]
 async fn can_extract_path_params() {
     const RESPONSE_TEXT: &str = "Hello world";
-    let router: Router<Incoming, routerify_ng::Error> = Router::builder()
+    let router: Router<routerify_ng::Error> = Router::builder()
         .get("/api/:first/plus/:second", |req| async move {
             let first = req.param("first").unwrap();
             let second = req.param("second").unwrap();
@@ -283,7 +281,7 @@ async fn can_extract_path_params() {
 #[tokio::test]
 async fn can_extract_extension_path_params_1() {
     const RESPONSE_TEXT: &str = "Hello world";
-    let router: Router<Incoming, routerify_ng::Error> = Router::builder()
+    let router: Router<routerify_ng::Error> = Router::builder()
         .get("/api/:id.json", |req| async move {
             let id = req.param("id").unwrap();
             assert_eq!(id, "40");
@@ -314,7 +312,7 @@ async fn can_extract_extension_path_params_1() {
 #[tokio::test]
 async fn can_extract_extension_path_params_2() {
     const RESPONSE_TEXT: &str = "Hello world";
-    let router: Router<Incoming, routerify_ng::Error> = Router::builder()
+    let router: Router<routerify_ng::Error> = Router::builder()
         .get("/api/:fileName", |req| async move {
             let file_name = req.param("fileName").unwrap();
             assert_eq!(file_name, "data.json");
@@ -344,14 +342,14 @@ async fn can_extract_extension_path_params_2() {
 
 #[tokio::test]
 async fn do_not_execute_scoped_middleware_for_unscoped_path() {
-    let api_router: Router<Incoming, routerify_ng::Error> = Router::builder()
+    let api_router: Router<routerify_ng::Error> = Router::builder()
         .middleware(Middleware::pre(|_| async { panic!("should not be executed") }))
         .middleware(Middleware::post(|_| async { panic!("should not be executed") }))
         .get("/api/todo", |_| async { Ok(Response::new("".into())) })
         .build()
         .unwrap();
 
-    let router: Router<Incoming, routerify_ng::Error> = Router::builder()
+    let router: Router<routerify_ng::Error> = Router::builder()
         .get("/", |_| async { Ok(Response::new("".into())) })
         .scope("/api", api_router)
         .get("/api/login", |_| async { Ok(Response::new("".into())) })
@@ -385,7 +383,7 @@ async fn execute_scoped_middleware_when_no_unscoped_match() {
     let executed_post = Arc::new(ExecPost(AtomicBool::new(false)));
 
     // Record the execution of pre and post middleware.
-    let api_router: Router<Incoming, routerify_ng::Error> = Router::builder()
+    let api_router: Router<routerify_ng::Error> = Router::builder()
         .middleware(Middleware::pre(|req| async {
             let pre = req.data::<Arc<ExecPre>>().unwrap();
             pre.0.store(true, SeqCst);
@@ -400,7 +398,7 @@ async fn execute_scoped_middleware_when_no_unscoped_match() {
         .build()
         .unwrap();
 
-    let router: Router<Incoming, routerify_ng::Error> = Router::builder()
+    let router: Router<routerify_ng::Error> = Router::builder()
         .data(executed_pre.clone())
         .data(executed_post.clone())
         .get("/", |_| async { Ok(Response::new("".into())) })
@@ -444,7 +442,7 @@ async fn can_handle_custom_errors() {
     }
 
     const RESPONSE_TEXT: &str = "Something went wrong!";
-    let router: Router<Incoming, ApiError> = Router::builder()
+    let router: Router<ApiError> = Router::builder()
         .get("/", |_| async move { Err(ApiError::Generic(RESPONSE_TEXT.into())) })
         .err_handler(|err: RouteError| async move {
             let api_err = err.downcast::<ApiError>().unwrap();
@@ -490,7 +488,7 @@ async fn can_handle_pre_middleware_errors() {
     // If pre middleware fails, then `data` and `req.context` should
     // propagate to the error handler and post middleware. The route
     // handler should not be executed.
-    let router: Router<Incoming, routerify_ng::Error> = Router::builder()
+    let router: Router<routerify_ng::Error> = Router::builder()
         .data(state)
         .middleware(Middleware::pre(|req| async move {
             req.set_context(Ctx);

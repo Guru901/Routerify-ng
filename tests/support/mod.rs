@@ -1,5 +1,4 @@
 use hyper::body::Bytes;
-use hyper::body::Incoming;
 use hyper::service::Service;
 use hyper_util::rt::TokioExecutor;
 use hyper_util::rt::TokioIo;
@@ -31,7 +30,7 @@ impl Serve {
     }
 }
 
-pub async fn serve<E>(router: Router<Incoming, E>) -> Serve
+pub async fn serve<E>(router: Router<E>) -> Serve
 where
     E: Into<Box<dyn std::error::Error + Send + Sync>> + 'static,
 {

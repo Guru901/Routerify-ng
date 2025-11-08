@@ -1,6 +1,5 @@
 use bytes::Bytes;
 use http_body_util::Full;
-use hyper::body::Incoming;
 use hyper::service::Service;
 use hyper::{Request, Response, StatusCode};
 use hyper_util::rt::TokioExecutor;
@@ -35,7 +34,7 @@ impl std::fmt::Display for ApiError {
 // In this case it's `ApiError`.
 
 // A handler for "/" page.
-async fn home_handler(_: Request<Incoming>) -> Result<Response<Full<Bytes>>, ApiError> {
+async fn home_handler(_: Request<Full<Bytes>>) -> Result<Response<Full<Bytes>>, ApiError> {
     // Simulate failure by returning `ApiError::Generic` variant.
     Err(ApiError::Generic("Something went wrong!".into()))
 }
@@ -61,7 +60,7 @@ async fn error_handler(err: routerify_ng::RouteError) -> Response<Full<Bytes>> {
     }
 }
 
-fn router() -> Router<Incoming, ApiError> {
+fn router() -> Router<ApiError> {
     // Create a router and specify the the handlers.
     Router::builder()
         .get("/", home_handler)

@@ -1,6 +1,5 @@
 use bytes::Bytes;
 use http_body_util::Full;
-use hyper::body::Incoming;
 use hyper::service::Service;
 use hyper::{Request, Response};
 use hyper_util::rt::TokioExecutor;
@@ -15,7 +14,7 @@ use std::sync::Arc;
 use tokio::net::TcpListener;
 
 // A handler for "/" page.
-async fn home_handler(_: Request<Incoming>) -> Result<Response<Full<Bytes>>, io::Error> {
+async fn home_handler(_: Request<Full<Bytes>>) -> Result<Response<Full<Bytes>>, io::Error> {
     Ok(Response::new(Full::from("Home page")))
 }
 
@@ -25,7 +24,7 @@ mod api {
 
     // Define a handler for "/users/:userName/books/:bookName" API endpoint which will have two
     // route parameters: `userName` and `bookName`.
-    async fn user_book_handler(req: Request<Incoming>) -> Result<Response<Full<Bytes>>, io::Error> {
+    async fn user_book_handler(req: Request<Full<Bytes>>) -> Result<Response<Full<Bytes>>, io::Error> {
         let user_name = req.param("userName").unwrap();
         let book_name = req.param("bookName").unwrap();
 
@@ -35,7 +34,7 @@ mod api {
         ))))
     }
 
-    pub fn router() -> Router<Incoming, io::Error> {
+    pub fn router() -> Router<io::Error> {
         // Create a router for API and specify the the handlers.
         Router::builder()
             .get("/users/:userName/books/:bookName", user_book_handler)
@@ -44,7 +43,7 @@ mod api {
     }
 }
 
-fn router() -> Router<Incoming, io::Error> {
+fn router() -> Router<io::Error> {
     // Create a root router and specify the the handlers.
     Router::builder()
         .get("/", home_handler)

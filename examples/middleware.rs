@@ -1,6 +1,5 @@
 use bytes::Bytes;
 use http_body_util::Full;
-use hyper::body::Incoming;
 use hyper::service::Service;
 use hyper::{
     Request, Response,
@@ -18,18 +17,18 @@ use std::sync::Arc;
 use tokio::net::TcpListener;
 
 // A handler for "/" page.
-async fn home_handler(_: Request<Incoming>) -> Result<Response<Full<Bytes>>, io::Error> {
+async fn home_handler(_: Request<Full<Bytes>>) -> Result<Response<Full<Bytes>>, io::Error> {
     Ok(Response::new(Full::from("Home page")))
 }
 
 // A handler for "/about" page.
-async fn about_handler(_: Request<Incoming>) -> Result<Response<Full<Bytes>>, io::Error> {
+async fn about_handler(_: Request<Full<Bytes>>) -> Result<Response<Full<Bytes>>, io::Error> {
     Ok(Response::new(Full::from("About page")))
 }
 
 // Define a pre middleware handler which will be executed on every request and
 // logs some meta.
-async fn logger_middleware(req: Request<Incoming>) -> Result<Request<Incoming>, io::Error> {
+async fn logger_middleware(req: Request<Full<Bytes>>) -> Result<Request<Full<Bytes>>, io::Error> {
     println!("{} {} {}", req.remote_addr(), req.method(), req.uri().path());
     Ok(req)
 }
@@ -61,7 +60,7 @@ async fn my_session_middleware(
     Ok(res)
 }
 
-fn router() -> Router<Incoming, io::Error> {
+fn router() -> Router<io::Error> {
     // Create a router and specify the the handlers.
     Router::builder()
         // Create a pre middleware using `Middleware::pre()` method

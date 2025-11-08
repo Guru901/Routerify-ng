@@ -37,7 +37,7 @@ impl RouteParams {
     /// use std::convert::Infallible;
     /// use hyper::body::Incoming;
     ///
-    /// fn run() -> Router<Incoming, Infallible> {
+    /// fn run() -> Router<Infallible> {
     ///     let router = Router::builder()
     ///         .get("/users/:userName/books/:bookName", |req| async move {
     ///             let params: &RouteParams = req.params();
@@ -71,7 +71,7 @@ impl RouteParams {
     /// use std::convert::Infallible;
     /// use hyper::body::Incoming;
     ///
-    /// fn run() -> Router<Incoming, Infallible> {
+    /// fn run() -> Router<Infallible> {
     ///     let router = Router::builder()
     ///         .get("/users/:userName", |req| async move {
     ///             let params: &RouteParams = req.params();

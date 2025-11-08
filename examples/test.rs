@@ -14,7 +14,6 @@ use tokio::net::TcpListener;
 
 mod users {
     use http::Request;
-    use hyper::body::Incoming;
     use routerify_ng::ext::RequestExt;
     use std::sync::Mutex;
 
@@ -25,12 +24,12 @@ mod users {
         count: Arc<Mutex<u8>>,
     }
 
-    async fn list(req: Request<Incoming>) -> Result<Response<Full<Bytes>>, io::Error> {
+    async fn list(req: Request<Full<Bytes>>) -> Result<Response<Full<Bytes>>, io::Error> {
         let count = req.data::<State>().unwrap().count.lock().unwrap();
         Ok(Response::new(Full::from(format!("Suppliers: {}", count))))
     }
 
-    pub fn router() -> Router<Incoming, io::Error> {
+    pub fn router() -> Router<io::Error> {
         let state = State {
             count: Arc::new(Mutex::new(20)),
         };
@@ -42,7 +41,6 @@ mod offers {
     use std::sync::Mutex;
 
     use http::Request;
-    use hyper::body::Incoming;
     use routerify_ng::ext::RequestExt;
 
     use super::*;
@@ -52,7 +50,7 @@ mod offers {
         count: Arc<Mutex<u8>>,
     }
 
-    async fn list(req: Request<Incoming>) -> Result<Response<Full<Bytes>>, io::Error> {
+    async fn list(req: Request<Full<Bytes>>) -> Result<Response<Full<Bytes>>, io::Error> {
         let count = req.data::<State>().unwrap().count.lock().unwrap();
 
         println!("I can also access parent state: {:?}", req.data::<String>().unwrap());
@@ -60,7 +58,7 @@ mod offers {
         Ok(Response::new(Full::from(format!("Suppliers: {}", count))))
     }
 
-    pub fn router() -> Router<Incoming, io::Error> {
+    pub fn router() -> Router<io::Error> {
         let state = State {
             count: Arc::new(Mutex::new(100)),
         };
