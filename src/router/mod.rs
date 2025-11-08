@@ -299,7 +299,7 @@ impl<E: Into<Box<dyn std::error::Error + Send + Sync>> + 'static> Router<E> {
 
                     if route.is_match_method(transformed_req.method()) {
                         // Convert transformed_req to the expected type for route.process
-                        let req_for_route = transformed_req.map(|b| Full::from(b));
+                        let req_for_route = transformed_req.map(|b| b);
                         let route_resp_res = route.process(target_path, req_for_route).await;
 
                         let route_resp = match route_resp_res {
