@@ -1,7 +1,6 @@
 use crate::data_map::SharedDataMap;
 use crate::types::{RequestContext, RequestMeta, RouteParams};
 use hyper::Request;
-use hyper::body::Incoming;
 use std::net::SocketAddr;
 
 /// A extension trait which extends the [`hyper::Request`](https://docs.rs/hyper/0.14.4/hyper/struct.Request.html) and [`http::Parts`](https://docs.rs/http/0.2.4/http/request/struct.Parts.html) types with some helpful methods.
@@ -16,8 +15,9 @@ pub trait RequestExt {
     /// use routerify_ng::ext::RequestExt;
     /// use routerify_ng::{RouteParams, Router};
     /// use std::convert::Infallible;
+    /// use hyper::body::Incoming;
     ///
-    /// fn run() -> Router<Infallible> {
+    /// fn run() -> Router<Incoming, hyper::Error> {
     ///     let router = Router::builder()
     ///         .get("/users/:userName/books/:bookName", |req| async move {
     ///             let params: &RouteParams = req.params();
@@ -47,8 +47,9 @@ pub trait RequestExt {
     /// use routerify_ng::ext::RequestExt;
     /// use routerify_ng::Router;
     /// use std::convert::Infallible;
+    /// use hyper::body::Incoming;
     ///
-    /// fn run() -> Router<Infallible> {
+    /// fn run() -> Router<Incoming, Infallible> {
     ///     let router = Router::builder()
     ///         .get("/users/:userName/books/:bookName", |req| async move {
     ///             let user_name = req.param("userName").unwrap();
@@ -70,13 +71,15 @@ pub trait RequestExt {
     ///
     /// # Examples
     ///
-    /// ```use http_body_util::Full;
+    /// ```
+    /// use http_body_util::Full;
     /// use hyper::{body::Bytes, Response};
     /// use routerify_ng::ext::RequestExt;
     /// use routerify_ng::Router;
     /// use std::convert::Infallible;
+    /// use hyper::body::Incoming;
     ///
-    /// fn run() -> Router<Infallible> {
+    /// fn run() -> Router<Incoming, Infallible> {
     ///     let router = Router::builder()
     ///         .get("/hello", |req| async move {
     ///             let remote_addr = req.remote_addr();
@@ -114,7 +117,7 @@ pub trait RequestExt {
     /// use routerify_ng::{Middleware, Router};
     /// use std::convert::Infallible;
     ///
-    /// fn run() -> Router<Infallible> {
+    /// fn run() -> Router<Incoming, Infallible> {
     ///     let router = Router::builder()
     ///         .middleware(Middleware::pre(|req: Request<Incoming>| async move {
     ///             req.set_context("example".to_string());
@@ -175,7 +178,7 @@ fn set_context<T: Send + Sync + Clone + 'static>(ext: &http::Extensions, val: T)
     ctx.set(val)
 }
 
-impl RequestExt for Request<Incoming> {
+impl<B> RequestExt for Request<B> {
     fn params(&self) -> &RouteParams {
         params(self.extensions())
     }

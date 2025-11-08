@@ -61,7 +61,7 @@ async fn my_session_middleware(
     Ok(res)
 }
 
-fn router() -> Router<io::Error> {
+fn router() -> Router<Incoming, io::Error> {
     // Create a router and specify the the handlers.
     Router::builder()
         // Create a pre middleware using `Middleware::pre()` method

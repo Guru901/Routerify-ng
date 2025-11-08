@@ -3,6 +3,7 @@ use crate::helpers;
 use crate::regex_generator::generate_exact_match_regex;
 use crate::types::{RequestMeta, RouteParams};
 use http_body_util::Full;
+use hyper::body::Body;
 use hyper::body::Bytes;
 use hyper::{Method, Request, Response};
 use regex::Regex;
@@ -10,7 +11,7 @@ use std::fmt::{self, Debug, Formatter};
 use std::future::Future;
 use std::pin::Pin;
 
-type Handler<E> = Box<dyn Fn(Request<hyper::body::Incoming>) -> HandlerReturn<E> + Send + Sync + 'static>;
+type Handler<T, E> = Box<dyn Fn(Request<T>) -> HandlerReturn<E> + Send + Sync + 'static>;
 type HandlerReturn<E> = Box<dyn Future<Output = Result<Response<Full<Bytes>>, E>> + Send + 'static>;
 
 /// Represents a single route.
@@ -39,30 +40,30 @@ type HandlerReturn<E> = Box<dyn Future<Output = Result<Response<Full<Bytes>>, E>
 ///     Ok(Response::new(Full::new(Bytes::from("home"))))
 /// }
 ///
-/// fn run() -> Router<hyper::Error> {
+/// fn run() -> Router<Incoming, hyper::Error> {
 ///     let router = Router::builder().get("/", home_handler).build().unwrap();
 ///     router
 /// }
 /// ```
-pub struct Route<E> {
+pub struct Route<T, E> {
     pub(crate) path: String,
     pub(crate) regex: Regex,
     route_params: Vec<String>,
     // Make it an option so that when a router is used to scope in another router,
     // It can be extracted out by 'opt.take()' without taking the whole router's ownership.
-    pub(crate) handler: Option<Handler<E>>,
+    pub(crate) handler: Option<Handler<T, E>>,
     pub(crate) methods: Vec<Method>,
     // Scope depth with regards to the top level router.
     pub(crate) scope_depth: u32,
 }
 
-impl<E: Into<Box<dyn std::error::Error + Send + Sync>> + 'static> Route<E> {
+impl<T: Body, E: Into<Box<dyn std::error::Error + Send + Sync>> + 'static> Route<T, E> {
     pub(crate) fn new_with_boxed_handler<P: Into<String>>(
         path: P,
         methods: Vec<Method>,
-        handler: Handler<E>,
+        handler: Handler<T, E>,
         scope_depth: u32,
-    ) -> crate::Result<Route<E>> {
+    ) -> crate::Result<Route<T, E>> {
         let path = path.into();
         let (re, params) = generate_exact_match_regex(path.as_str()).map_err(|e| {
             Error::new(format!(
@@ -81,13 +82,13 @@ impl<E: Into<Box<dyn std::error::Error + Send + Sync>> + 'static> Route<E> {
         })
     }
 
-    pub(crate) fn new<P, H, R>(path: P, methods: Vec<Method>, handler: H) -> crate::Result<Route<E>>
+    pub(crate) fn new<P, H, R>(path: P, methods: Vec<Method>, handler: H) -> crate::Result<Route<T, E>>
     where
         P: Into<String>,
-        H: Fn(Request<hyper::body::Incoming>) -> R + Send + Sync + 'static,
+        H: Fn(Request<T>) -> R + Send + Sync + 'static,
         R: Future<Output = Result<Response<Full<Bytes>>, E>> + Send + 'static,
     {
-        let handler: Handler<E> = Box::new(move |req: Request<hyper::body::Incoming>| Box::new(handler(req)));
+        let handler: Handler<T, E> = Box::new(move |req: Request<T>| Box::new(handler(req)));
         Route::new_with_boxed_handler(path, methods, handler, 1)
     }
 
@@ -95,11 +96,7 @@ impl<E: Into<Box<dyn std::error::Error + Send + Sync>> + 'static> Route<E> {
         self.methods.contains(method)
     }
 
-    pub(crate) async fn process(
-        &self,
-        target_path: &str,
-        mut req: Request<hyper::body::Incoming>,
-    ) -> crate::Result<Response<Full<Bytes>>> {
+    pub(crate) async fn process(&self, target_path: &str, mut req: Request<T>) -> crate::Result<Response<Full<Bytes>>> {
         self.push_req_meta(target_path, &mut req);
 
         let handler = self
@@ -110,11 +107,11 @@ impl<E: Into<Box<dyn std::error::Error + Send + Sync>> + 'static> Route<E> {
         Pin::from(handler(req)).await.map_err(Into::into)
     }
 
-    fn push_req_meta(&self, target_path: &str, req: &mut Request<hyper::body::Incoming>) {
+    fn push_req_meta(&self, target_path: &str, req: &mut Request<T>) {
         self.update_req_meta(req, self.generate_req_meta(target_path));
     }
 
-    fn update_req_meta(&self, req: &mut Request<hyper::body::Incoming>, req_meta: RequestMeta) {
+    fn update_req_meta(&self, req: &mut Request<T>, req_meta: RequestMeta) {
         helpers::update_req_meta_in_extensions(req.extensions_mut(), req_meta);
     }
 
@@ -141,7 +138,7 @@ impl<E: Into<Box<dyn std::error::Error + Send + Sync>> + 'static> Route<E> {
     }
 }
 
-impl<E> Debug for Route<E> {
+impl<T, E> Debug for Route<T, E> {
     fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
         write!(
             f,

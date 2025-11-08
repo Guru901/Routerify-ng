@@ -53,7 +53,7 @@ async fn error_handler(err: routerify_ng::RouteError, req_info: RequestInfo) -> 
 
 // Create a `Router<Body, Infallible>` for response body type `hyper::Body`
 // and for handler error type `Infallible`.
-fn router() -> Router<Infallible> {
+fn router() -> Router<Incoming, Infallible> {
     Router::builder()
         // Specify the state data which will be available to every route handlers,
         // error handler and middlewares.

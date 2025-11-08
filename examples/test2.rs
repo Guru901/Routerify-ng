@@ -52,7 +52,7 @@ async fn error_handler(err: routerify_ng::RouteError, req_info: RequestInfo) -> 
         .unwrap()
 }
 
-fn router2() -> Router<routerify_ng::Error> {
+fn router2() -> Router<Incoming, routerify_ng::Error> {
     Router::builder()
         .data(111_u32)
         .get("/a", |req: Request<Incoming>| async move {
@@ -65,7 +65,7 @@ fn router2() -> Router<routerify_ng::Error> {
         .unwrap()
 }
 
-fn router3() -> Router<routerify_ng::Error> {
+fn router3() -> Router<Incoming, routerify_ng::Error> {
     Router::builder()
         .data(555_u32)
         .get("/h/g/j", |req: Request<Incoming>| async move {
@@ -80,7 +80,7 @@ fn router3() -> Router<routerify_ng::Error> {
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
-    let router: Router<routerify_ng::Error> = Router::builder()
+    let router: Router<Incoming, routerify_ng::Error> = Router::builder()
         .data(State(100))
         .scope("/r", router2())
         .scope("/bcd", router3())

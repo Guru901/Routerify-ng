@@ -30,7 +30,7 @@ mod users {
         Ok(Response::new(Full::from(format!("Suppliers: {}", count))))
     }
 
-    pub fn router() -> Router<io::Error> {
+    pub fn router() -> Router<Incoming, io::Error> {
         let state = State {
             count: Arc::new(Mutex::new(20)),
         };
@@ -60,7 +60,7 @@ mod offers {
         Ok(Response::new(Full::from(format!("Suppliers: {}", count))))
     }
 
-    pub fn router() -> Router<io::Error> {
+    pub fn router() -> Router<Incoming, io::Error> {
         let state = State {
             count: Arc::new(Mutex::new(100)),
         };

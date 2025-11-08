@@ -31,7 +31,7 @@ async fn user_book_handler(req: Request<Incoming>) -> Result<Response<Full<Bytes
     ))))
 }
 
-fn router() -> Router<io::Error> {
+fn router() -> Router<Incoming, io::Error> {
     // Create a router and specify the the handlers.
     Router::builder()
         .get("/", home_handler)
