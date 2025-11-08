@@ -1,5 +1,42 @@
 # Changelog
 
+## [0.3.0] - 2025-11-08
+
+- Router Type Simplification
+
+  - Router generic parameters reduced: Router<T, E> → Router<E>
+    - Before: fn router() -> Router<Incoming, io::Error>
+    - After: fn router() -> Router<io::Error>
+
+- Handler Signatures
+
+- Request type updated: All handlers now use Request<Full<Bytes>> instead of Request<Incoming>
+
+  - Before: async fn handler(req: Request<Incoming>) -> Result<Response<Full<Bytes>>, E>
+  - After: async fn handler(req: Request<Full<Bytes>>) -> Result<Response<Full<Bytes>>, E>
+
+- Middleware Types
+
+  - Middleware simplified: Middleware<T, E> → Middleware<E>
+    - PreMiddleware<T, E> → PreMiddleware<E>
+    - PostMiddleware<T, E> → PostMiddleware<E>
+  - Middleware handlers: Now accept/return Request<Full<Bytes>> instead of Request<T>
+
+- Service Types
+
+  - RequestService: RequestService<T, E> → RequestService<E>
+  - RequestServiceBuilder: RequestServiceBuilder<T, E> → RequestServiceBuilder<E>
+  - RouterService: RouterService<T, E> → RouterService<E>
+
+- Added new Service implementation for Request<Incoming> that streams and collects body data
+
+- Route Types
+  - Route: Route<T, E> → Route<E>
+- Internal handlers now operate on Request<Full<Bytes>>
+- RouterBuilder
+- Builder: RouterBuilder<T, E> → RouterBuilder<E>
+- All route registration methods (.get(), .post(), etc.) now expect handlers with Request<Full<Bytes>>
+
 ## [0.2.0] - 2025-11-08
 
 ## Added
