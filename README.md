@@ -1,6 +1,6 @@
 # Routerify-NG
 
-[![CI](https://github.com/guru901/routerify-ng/actions/workflows/ci.yml/badge.svg)](https://github.com/guru901/routerify-ng/actions)
+[![CI](https://github.com/guru901/routerify-ng/actions/workflows/test.yml/badge.svg)](https://github.com/guru901/routerify-ng/actions)
 [![crates.io](https://img.shields.io/crates/v/routerify-ng.svg)](https://crates.io/crates/routerify-ng)
 [![Documentation](https://docs.rs/routerify-ng/badge.svg)](https://docs.rs/routerify-ng)
 [![License](https://img.shields.io/crates/l/routerify-ng.svg)](./LICENSE)
